@@ -30,19 +30,34 @@ pub struct Remote {
     addr: String,
     conn: Option<(BufReader<TcpStream>, TcpStream)>,
     next_id: u64,
+    /// The app's control token, sent as each connection's first frame (`auth`).
+    token: Option<String>,
 }
 
 impl Remote {
     /// Connect to `addr` (e.g. `127.0.0.1:7980`), failing fast when nothing is listening.
     pub fn connect(addr: &str) -> std::io::Result<Self> {
-        let mut r = Self { addr: addr.to_string(), conn: None, next_id: 1 };
+        Self::connect_with_token(addr, None)
+    }
+
+    /// [`Remote::connect`], authenticating each connection with `token` (the app's control token,
+    /// `lightcraft_engine::control_token`).
+    pub fn connect_with_token(addr: &str, token: Option<String>) -> std::io::Result<Self> {
+        let mut r = Self { addr: addr.to_string(), conn: None, next_id: 1, token };
         r.reconnect()?;
         Ok(r)
     }
 
     /// A remote that connects on first use (the app may start after the MCP server).
     pub fn lazy(addr: &str) -> Self {
-        Self { addr: addr.to_string(), conn: None, next_id: 1 }
+        Self { addr: addr.to_string(), conn: None, next_id: 1, token: None }
+    }
+
+    /// Authenticate each connection with `token`.
+    #[must_use]
+    pub fn with_token(mut self, token: Option<String>) -> Self {
+        self.token = token;
+        self
     }
 
     pub fn addr(&self) -> &str {
@@ -59,7 +74,12 @@ impl Remote {
                     // The app answers within 60 s (its own timeout); leave headroom.
                     s.set_read_timeout(Some(Duration::from_secs(90))).ok();
                     let read = s.try_clone()?;
-                    self.conn = Some((BufReader::new(read), s));
+                    let mut reader = BufReader::new(read);
+                    let mut writer = s;
+                    if let Some(token) = &self.token {
+                        authenticate(&mut reader, &mut writer, token)?;
+                    }
+                    self.conn = Some((reader, writer));
                     return Ok(());
                 }
                 Err(e) => last = e,
@@ -93,6 +113,25 @@ impl Remote {
     fn unknown_outcome(&self, method: &str, e: &std::io::Error) -> String {
         let addr = &self.addr;
         format!("lost the LightCraft app at {addr} after sending `{method}` ({e}); the outcome is unknown and it was not resent, check the app")
+    }
+}
+
+/// Send the `auth` frame and check the app accepted it.
+fn authenticate(reader: &mut impl BufRead, writer: &mut impl Write, token: &str) -> std::io::Result<()> {
+    let line = json!({"id": "auth", "method": "auth", "params": {"token": token}}).to_string();
+    writer.write_all(format!("{line}\n").as_bytes())?;
+    writer.flush()?;
+    let reply = read_reply(reader, MAX_REPLY)?;
+    let v: Value =
+        serde_json::from_str(&reply).map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, format!("bad auth reply from app: {e}")))?;
+    if v.get("ok").and_then(Value::as_bool) == Some(true) {
+        Ok(())
+    } else {
+        let why = v.get("error").and_then(Value::as_str).unwrap_or("refused");
+        Err(std::io::Error::new(
+            std::io::ErrorKind::PermissionDenied,
+            format!("the app refused the control token ({why}); use the app's token (LIGHTCRAFT_CONTROL_TOKEN or LIGHTCRAFT_CONTROL_TOKEN_FILE)"),
+        ))
     }
 }
 

@@ -24,9 +24,31 @@ optional; blank lines are skipped). Anything else — text that isn't JSON, a JS
 it on that connection runs. This keeps an HTTP request (for example a web page's cross-origin `fetch` to
 `127.0.0.1:<port>`) from smuggling a command in its body: its request line is rejected first. Junk never reaches the
 UI thread, and at most 16 connections are served at once (further ones get an error line and are closed). Clients
-that hit an error reply should reconnect. The port has no authentication, so only enable it when you need it. The MCP server's connect
+that hit an error reply should reconnect. The MCP server's connect
 mode ([mcp.md](mcp.md)) is a thin layer over this channel. Implementation:
 `crates/ui-egui/src/control.rs` (methods) and `apps/lightcraft/src/control_server.rs` (transport).
+
+## Authentication
+
+Every connection authenticates first. Its first request must be
+
+```text
+→ {"id": "auth", "method": "auth", "params": {"token": "<64 hexadecimal characters>"}}
+← {"id": "auth", "ok": true, "result": {"authenticated": true}}
+```
+
+Any other first request (another method, a missing or wrong token) gets
+`{"ok": false, "error": "authentication required"}` and the connection is closed before anything is
+dispatched. A later `auth` on an authenticated connection gets `"already authenticated"`. Tokens are
+compared without an early exit.
+
+The app takes its token from `$LIGHTCRAFT_CONTROL_TOKEN`, or from a token file: `--control-token-file PATH`,
+`$LIGHTCRAFT_CONTROL_TOKEN_FILE`, or `<settings folder>/control-token` by default. A missing file is
+created with a new random token, readable by its owner only (0600 on Unix); a file others can read is
+refused. `lightcraft-cli run|mcp --connect` and `docs/showcase/run.py` read the same variables and file,
+so one user's app and tools agree without setup. These guarantees are tested in
+`apps/lightcraft/src/control_server.rs` (every method the UI dispatcher answers is refused without the
+token; the listener is bound to `127.0.0.1`) and `crates/engine/src/control_token.rs`.
 
 ## Isolated automation profiles
 

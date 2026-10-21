@@ -41,7 +41,9 @@ USAGE:
         --demo            headless, the procedural demo library
         --library DIR     headless, open (or create) a LightCraft library; edits are saved
         --import PATH     headless, import a file or folder first (repeatable)
-        --connect [ADDR]  drive the running app (`lightcraft --control 7980`; default 127.0.0.1:7980)
+        --connect [ADDR]  drive the running app (`lightcraft --control 7980`; default 127.0.0.1:7980),
+                          authenticating with its control token ($LIGHTCRAFT_CONTROL_TOKEN, else the file
+                          $LIGHTCRAFT_CONTROL_TOKEN_FILE or <settings folder>/control-token)
         --script FILE|-   also run JSON lines {\"command\": id, \"params\": {…}} (or {\"method\": …})
         --keep-going      continue after a failed command
   lightcraft-cli mcp [OPTIONS] [FILES/FOLDERS…]
@@ -333,14 +335,15 @@ fn mcp(args: &[String]) -> Result<(), String> {
             if !files.is_empty() || demo || library.is_some() {
                 return Err("FILES, --demo and --library apply to headless mode only (import through the `import` tool instead)".into());
             }
-            match Remote::connect(&addr) {
+            let token = control_token()?;
+            match Remote::connect_with_token(&addr, token.clone()) {
                 Ok(r) => {
                     eprintln!("lightcraft-cli mcp: connected to LightCraft at {addr}");
                     Box::new(r)
                 }
                 Err(e) => {
                     eprintln!("lightcraft-cli mcp: LightCraft is not reachable at {addr} yet ({e}); will retry on each call");
-                    Box::new(Remote::lazy(&addr))
+                    Box::new(Remote::lazy(&addr).with_token(token))
                 }
             }
         }
@@ -480,6 +483,14 @@ fn synth_merge(args: &[String]) -> Result<(), String> {
     Ok(())
 }
 
+/// The running app's control token for `--connect`: `$LIGHTCRAFT_CONTROL_TOKEN`, else the token file
+/// (`$LIGHTCRAFT_CONTROL_TOKEN_FILE`, default `<settings folder>/control-token`, which the app
+/// creates). `None` when there is none, and the app will refuse the connection.
+fn control_token() -> Result<Option<String>, String> {
+    use lightcraft_engine::control_token as ct;
+    ct::client_token(ct::token_from_env().as_deref(), ct::token_file_from_env().as_deref()).map_err(|e| format!("control token: {e}"))
+}
+
 /// One step of `lightcraft-cli run`: a command id (or control-protocol method) and its params.
 #[derive(Debug, PartialEq)]
 struct Step {
@@ -578,7 +589,7 @@ fn run(args: &[String]) -> Result<(), String> {
                 if demo || library.is_some() || !imports.is_empty() {
                     return Err("--demo, --library and --import apply to headless mode only".into());
                 }
-                Box::new(Remote::connect(&addr).map_err(|e| {
+                Box::new(Remote::connect_with_token(&addr, control_token()?).map_err(|e| {
                     format!("LightCraft is not reachable at {addr} ({e}); start it with `lightcraft --control {}`", connect_port(&addr))
                 })?)
             }

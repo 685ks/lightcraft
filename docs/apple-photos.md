@@ -100,9 +100,8 @@ prompt (`packaging/macos/Info.plist.in`). Without them macOS refuses the events 
 not only files it exported. So any client of the control port or the MCP server can put any readable image or
 video on the Mac into the user's Photos library, and from there into iCloud Photos when that is on. macOS asks
 for the Automation permission once per app, not per import, so after the first Allow nothing asks again. The
-control port listens on 127.0.0.1 only and has no authentication ([control-protocol.md](control-protocol.md)),
-so any program on this Mac that can connect to it can do this, including programs of other users logged in to
-the Mac. The MCP server talks only to the program that started it (stdio). Treat giving an agent the MCP server
+control port listens on 127.0.0.1 only and requires the control token ([control-protocol.md](control-protocol.md)),
+so any program that can read your token file (your own programs) can do this. The MCP server talks only to the program that started it (stdio). Treat giving an agent the MCP server
 or the control port as giving it this too, and turn the control port on only when you need it.
 
 ## When it doesn't work

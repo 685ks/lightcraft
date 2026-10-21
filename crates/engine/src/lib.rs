@@ -23,6 +23,8 @@ pub mod camera_profiles;
 pub mod cmd;
 pub mod config;
 pub mod contact_sheet;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod control_token;
 pub mod crs;
 pub mod crs_masks;
 pub mod demo;
