@@ -107,7 +107,7 @@ jobs:
       # and nextest lists every retried test as flaky in the summary.
       - name: Test the workspace
         shell: bash
-        run: cargo nextest run --locked --workspace --no-fail-fast --retries 1
+        run: cargo nextest run --locked --workspace --no-fail-fast --retries 1 --status-level fail --final-status-level flaky --failure-output final
       - name: Doc tests
         shell: bash
         run: cargo test --locked --workspace --doc
