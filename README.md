@@ -1,16 +1,8 @@
-<p align="center">
-  <a href="https://getartcraft.com/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/brand/artcraft-logo-white.svg">
-      <img alt="ArtCraft" src="docs/brand/artcraft-logo.svg" width="200">
-    </picture>
-  </a>
-</p>
-
-
 <h1 align="center">LightCraft</h1>
 
 <h3 align="center">Your photos. Your pixels. Your machine.</h3>
+
+<p align="center"><i>A fork of <a href="https://github.com/storytold/lightcraft">storytold/lightcraft</a>, maintained by Arthavan Projects. Not affiliated with or endorsed by ArtCraft.</i></p>
 
 <p align="center">
   <a href="README.md">English</a> ·
@@ -28,19 +20,6 @@
   <img alt="MCP server included" src="https://img.shields.io/badge/MCP-ready-8a5800?style=flat-square">
   <img alt="License: MIT OR Apache-2.0" src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-8a5800?style=flat-square">
   <a href="ROADMAP.md"><img alt="Status: young and moving fast" src="https://img.shields.io/badge/status-young%20%26%20moving%20fast-f2a516?style=flat-square"></a>
-  <br>
-  <a href="https://sonarcloud.io/project/overview?id=storytold_lightcraft"><img alt="Scanned by SonarCloud" src="https://img.shields.io/badge/Scanned_by-SonarCloud-4b9fd5?style=flat-square&logo=sonarqubecloud&logoColor=white"></a>
-  <a href="https://coderabbit.ai"><img alt="Reviewed by CodeRabbit" src="https://img.shields.io/coderabbit/prs/github/storytold/lightcraft?style=flat-square&label=Reviewed%20by%20CodeRabbit&logo=coderabbit"></a>
-</p>
-
-<p align="center">
-  <a href="https://discord.gg/artcraft"><img alt="Join the ArtCraft community on Discord" src="https://img.shields.io/badge/Join%20us%20on%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" height="40"></a>
-</p>
-
-<p align="center">
-  <a href="https://getartcraft.com/apps/lightcraft"><b>LightCraft on getartcraft.com</b></a> ·
-  <a href="https://getartcraft.com/">ArtCraft</a> ·
-  <a href="https://getartcraft.com/apps">All Crafting Apps</a>
 </p>
 
 <br>
@@ -50,10 +29,6 @@
   <br>
   <sub><i>Ansel Adams, "The Tetons and the Snake River" (1942). Public domain, U.S. National Archives. Developed in LightCraft.</i></sub>
 </p>
-
-> [!NOTE]
-> **ArtCraft is a community of artists from all walks of life.** Digital, generative, music,
-> games &mdash; if you make things, you're one of us. **[Come say hi on Discord](https://discord.gg/artcraft).**
 
 <p align="center">
   <a href="#edit-like-you-mean-it">Editing</a> ·
@@ -391,7 +366,7 @@ LightCraft is young and moving fast: **alpha**. **Where we honestly stand** (det
 Workspace builds, including the desktop, web and CLI applications, require Rust 1.95 or newer.
 
 ```sh
-git clone https://github.com/storytold/lightcraft && cd lightcraft
+git clone https://github.com/685ks/lightcraft && cd lightcraft
 cargo run --release -p lightcraft                       # opens your library (~/Pictures/LightCraft Library; a new one starts with demo photos)
 cargo run --release -p lightcraft -- ~/Pictures/trip    # import your photos (folders are scanned, duplicates skipped)
 cargo run --release -p lightcraft -- --memory           # a throwaway in-memory demo session (writes nothing)
@@ -444,12 +419,12 @@ GPU tests on every backend that has a hardware adapter. Nothing is uploaded.
 **Chinese and Japanese text** need the shared font repo, an optional build input (official releases always include it):
 
 ```sh
-git clone https://github.com/storytold/craft-fonts ../craft-fonts
+git clone https://github.com/685ks/craft-fonts ../craft-fonts
 CRAFT_FONTS_DIR=../craft-fonts cargo run --release -p lightcraft
 ```
 
 Without it LightCraft builds and runs the same, but Chinese and Japanese text have no glyphs. Fonts are never committed to this
-repo — the standard for what goes there lives with it: see the [craft-fonts README](https://github.com/storytold/craft-fonts#readme).
+repo — the standard for what goes there lives with it: see the [craft-fonts README](https://github.com/685ks/craft-fonts#readme).
 
 **Interface language:** **Edit → Language** (English, 简体中文, 繁體中文（台灣）, 日本語, Português (Brasil), Español, Deutsch, Русский, Français, Українська, Polski, Čeština, Italiano, ქართული) or **Settings → General →
 Language**; the choice applies immediately and persists. See [docs/localization.md](docs/localization.md).
@@ -477,9 +452,9 @@ The web build needs the `wasm32-unknown-unknown` target and the matching `wasm-b
 text has glyphs):
 
 ```sh
-nix run github:storytold/lightcraft                    # the desktop app
-nix build github:storytold/lightcraft                  # → ./result/bin/{lightcraft,lightcraft-cli}
-nix develop github:storytold/lightcraft                # rust toolchain + native deps + fonts
+nix run github:685ks/lightcraft                    # the desktop app
+nix build github:685ks/lightcraft                  # → ./result/bin/{lightcraft,lightcraft-cli}
+nix develop github:685ks/lightcraft                # rust toolchain + native deps + fonts
 ```
 
 On NixOS, run a `cargo` build from `nix develop`: outside it the app can't find `libvulkan.so.1`, finds no GPU and
@@ -489,7 +464,7 @@ In a flake configuration (NixOS, home-manager, nix-darwin):
 
 ```nix
 # flake.nix
-inputs.lightcraft.url = "github:storytold/lightcraft";
+inputs.lightcraft.url = "github:685ks/lightcraft";
 # optional: build against your own nixpkgs instead of the one LightCraft pins
 # inputs.lightcraft.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -521,22 +496,22 @@ Humans and agents follow the same rules, so read [AGENTS.md](AGENTS.md) first. T
 - **No proprietary assets, ever:** no icons, screenshots, presets, profiles, LUTs or fonts from commercial products. Every
   image, icon and font in the repo is original, public domain, Creative Commons, OFL or permissively licensed, and has
   an entry in [assets/ATTRIBUTION.md](assets/ATTRIBUTION.md) added in the same commit. New fonts go to
-  [storytold/craft-fonts](https://github.com/storytold/craft-fonts), not here.
+  [storytold/craft-fonts](https://github.com/685ks/craft-fonts), not here.
 - **Pure Rust**, enforced crate layering, everything is a command, and `cargo xtask ci` green before every commit
   (one task id per commit).
 - **Never crash.** Non-test code returns errors instead of panicking: no `unwrap()`, `expect()`, `panic!` or
   `unsafe`, checked indexing on anything derived from input, and a regression test with every crash fix. Details in
   [AGENTS.md](AGENTS.md#never-crash-outranks-feature-work).
 
-Questions, ideas or a bug you'd like to talk through first? Bring them to [Discord](https://discord.gg/artcraft).
+Questions, ideas or a bug you'd like to talk through first? Open an [issue](https://github.com/685ks/lightcraft/issues).
 
 <br>
 
 ## Downloads
 
-**New to LightCraft?** Download it from the [LightCraft page on getartcraft.com](https://getartcraft.com/apps/lightcraft). That's the easiest way to install it.
+**New to LightCraft?** Install it with the Arthavan Projects launcher, which also keeps it up to date, or download a build from the releases below.
 
-**Want a specific build or format?** On GitHub, the [latest release](https://github.com/storytold/lightcraft/releases/latest) has every build listed below, and [all releases](https://github.com/storytold/lightcraft/releases) has earlier versions and their notes. `<ver>` in the file names is the version number, and `SHA256SUMS.txt` lists a checksum for every file.
+**Want a specific build or format?** On GitHub, the [latest release](https://github.com/685ks/lightcraft/releases/latest) has every build listed below, and [all releases](https://github.com/685ks/lightcraft/releases) has earlier versions and their notes. `<ver>` in the file names is the version number, and `SHA256SUMS.txt` lists a checksum for every file.
 
 ### Windows
 
@@ -588,43 +563,9 @@ windows file drag-and-drop; set `LIGHTCRAFT_WAYLAND=1` to use native Wayland (sh
 
 ## The Crafting Apps
 
-LightCraft is one of the **Crafting Apps**: free, open-source creative tools from the
-[ArtCraft](https://getartcraft.com/) team, each written from scratch in Rust and each able to
-stand on its own.
-
-| | App | What it's for | Code | Learn more |
-|:-:|---|---|---|---|
-| <img src="https://raw.githubusercontent.com/storytold/photocraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.photocraft.png" alt="" width="32" height="32"> | **PhotoCraft** | Image editing: layers, masks, type and real PSD files | [GitHub](https://github.com/storytold/photocraft) | [Website](https://getartcraft.com/apps/photocraft) |
-| <img src="https://raw.githubusercontent.com/storytold/vectorcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.vectorcraft.png" alt="" width="32" height="32"> | **VectorCraft** | Vector illustration | [GitHub](https://github.com/storytold/vectorcraft) | [Website](https://getartcraft.com/apps/vectorcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/filmcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.filmcraft.png" alt="" width="32" height="32"> | **FilmCraft** | Video editing, color and sound | [GitHub](https://github.com/storytold/filmcraft) | [Website](https://getartcraft.com/apps/filmcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/lightcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.lightcraft.png" alt="" width="32" height="32"> | **LightCraft** | **Photo library and raw development · you are here** | [GitHub](https://github.com/storytold/lightcraft) | [Website](https://getartcraft.com/apps/lightcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/pdfcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.pdfcraft.png" alt="" width="32" height="32"> | **PdfCraft** | Reading, organizing and protecting PDFs | [GitHub](https://github.com/storytold/pdfcraft) | [Website](https://getartcraft.com/apps/pdfcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/effectcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.effectcraft.png" alt="" width="32" height="32"> | **EffectCraft** | Motion graphics and visual effects | [GitHub](https://github.com/storytold/effectcraft) | [Website](https://getartcraft.com/apps/effectcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/designcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.designcraft.png" alt="" width="32" height="32"> | **DesignCraft** | Page layout and publishing | [GitHub](https://github.com/storytold/designcraft) | [Website](https://getartcraft.com/apps/designcraft) |
-
-And [**ArtCraft**](https://getartcraft.com/) itself, our AI image and video studio for artists who want real control.
-
-<br>
-
-<p align="center">
-  <a href="https://discord.gg/artcraft"><img alt="Join the ArtCraft community on Discord" src="https://img.shields.io/badge/Join%20us%20on%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" height="40"></a>
-</p>
-
-<h3 align="center">Come make things with us</h3>
-
-<p align="center">
-  Our Discord is where artists of every kind hang out: people who paint, shoot, draw, cut film,
-  set type, and people still figuring out what they like to make. Share what you're working on,
-  ask for help, tell us what's broken, or tell us what you wish these tools could do.
-  Whatever your medium and however long you've been at it, you're welcome here.
-</p>
-
-<p align="center">
-  <a href="https://discord.gg/artcraft"><b>discord.gg/artcraft</b></a> ·
-  <a href="https://getartcraft.com/">getartcraft.com</a> ·
-  <a href="https://getartcraft.com/apps">The Crafting Apps</a> ·
-  <a href="https://getartcraft.com/apps/lightcraft">LightCraft</a>
-</p>
+LightCraft is one of the Craft apps that Arthavan Projects maintains as forks of the open-source
+storytold apps, each written in Rust and each able to stand on its own. The Arthavan Projects
+launcher installs and updates them.
 
 <br>
 
@@ -639,22 +580,15 @@ with its author, source and license in [assets/ATTRIBUTION.md](assets/ATTRIBUTIO
 Showcase photographs are public-domain works, used via Wikimedia Commons: Ansel Adams, *The Tetons and the Snake River*
 (1942, U.S. National Archives); Dorothea Lange, *Migrant Mother* (1936, Library of Congress); Bill Anders / NASA,
 *Earthrise* (1968); NASA, *The Blue Marble* (1972). The demo library is procedurally generated by LightCraft. UI font:
-Inter (SIL OFL 1.1). Builds made with [craft-fonts](https://github.com/storytold/craft-fonts) (all official releases)
+Inter (SIL OFL 1.1). Builds made with [craft-fonts](https://github.com/685ks/craft-fonts) (all official releases)
 also embed its Chinese and Japanese fonts (Noto Sans CJK SC, BIZ UDPGothic, BIZ UDMincho, Shippori Mincho; SIL OFL 1.1), listed in its
-[ATTRIBUTION.md](https://github.com/storytold/craft-fonts/blob/main/ATTRIBUTION.md). All icons are original.
+[ATTRIBUTION.md](https://github.com/685ks/craft-fonts/blob/main/ATTRIBUTION.md). All icons are original.
 
-The ArtCraft name, wordmark and logos in [`docs/brand/`](docs/brand/) are trademarks of the
-ArtCraft Team and are not covered by this license. They may be used only unmodified, and only as
-part of this repository and LightCraft, under [`docs/brand/LICENSE-brand.txt`](docs/brand/LICENSE-brand.txt).
-Forks and modified versions must remove them.
-
-<p align="center">
-  <a href="https://getartcraft.com/"><img alt="ArtCraft" src="docs/brand/artcraft-mark.svg" width="28"></a><br>
-  <sub>Made by the <a href="https://getartcraft.com/">ArtCraft</a> team and community.</sub>
-</p>
+This is a fork of [storytold/lightcraft](https://github.com/storytold/lightcraft). It is not
+affiliated with or endorsed by ArtCraft, and it carries none of the ArtCraft name, wordmark or logos.
 
 ## Star history
 
-[![Star History Chart](https://api.star-history.com/svg?repos=storytold/lightcraft&type=Date&legend=top-left)](https://www.star-history.com/?repos=storytold%2Flightcraft&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=685ks/lightcraft&type=Date&legend=top-left)](https://www.star-history.com/?repos=685ks%2Flightcraft&type=date&legend=top-left)
 
 Library, Tools, and Presets panels can be regrouped, split, floated within the app window, closed, and reopened. Tools keeps the current Edit/Crop/Masking mode; the photo view and filmstrip stay together. Drag a panel header to a target edge or another header. Its context menu offers Float panel, Move to group, and Close panel. Existing panel toggles reopen panels at their saved location; Reset Panel Layout restores the app layout. Floating panels remain inside the current app window.

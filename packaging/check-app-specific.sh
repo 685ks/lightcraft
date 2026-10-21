@@ -13,10 +13,10 @@ grep -qF '<DialogRef Id="ExitDialog" />' packaging/windows/lightcraft.wxs \
 python3 - <<'PYEOF'
 import yaml
 manifests = []
-for name in ("ai.storyteller.lightcraft.yml", "ai.storyteller.lightcraft.bundle.yml"):
+for name in ("app.freedev.ainz.ks.LightCraft.yml", "app.freedev.ainz.ks.LightCraft.bundle.yml"):
     with open("packaging/linux/flatpak/" + name) as source:
         manifest = yaml.safe_load(source)
-    assert manifest["id"] == "ai.storyteller.lightcraft" and manifest["command"] == "lightcraft", name
+    assert manifest["id"] == "app.freedev.ainz.ks.LightCraft" and manifest["command"] == "lightcraft", name
     manifests.append(manifest)
 for key in ("runtime", "runtime-version", "sdk", "finish-args"):
     assert manifests[0][key] == manifests[1][key], f"Flatpak manifests disagree on {key}"
