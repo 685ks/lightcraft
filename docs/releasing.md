@@ -1,24 +1,28 @@
 # Releasing LightCraft
 
-The release pipeline is [`.github/workflows/release.yml`](../.github/workflows/release.yml).
-It runs on every push to the `release` branch. A maintainer can also dispatch it manually, with
-an optional version override such as `1.2.0-rc.1`; the release environment's branch restrictions
-still apply.
+The release pipeline is [`.github/workflows/release.yml`](../.github/workflows/release.yml). It
+calls the shared Arthavan Projects workflow `685ks/craft-actions/.github/workflows/release-rust-app.yml`
+with LightCraft's ids; the packaging metadata it reads (bundle id `app.freedev.ainz.ks.LightCraft`,
+publisher, categories, icons) is in [`packaging/app.toml`](../packaging/app.toml).
 
 ## Prepare and start a release
 
-1. Merge the release-ready changes into `release`.
-2. Set the workspace version in `Cargo.toml` (for example, with `cargo xtask version set 1.2.0`).
-   For a manual workflow run, the version input can override the workspace version for that run.
-   Use a semantic version such as `1.2.0` or `1.2.0-rc.1`; versions containing a hyphen are
-   marked as prereleases.
-3. Push to `release`, or dispatch the workflow on `release` (a dispatch on another branch is a dry run; see below).
-4. Check the workflow run and its artifacts. On success, the workflow creates or updates a **draft**
-   GitHub Release named `LightCraft v<version>`, targeted at the commit that triggered the run.
-   Review the draft and its `SHA256SUMS.txt`, then publish it in GitHub Releases when ready.
+1. Set the workspace version in `Cargo.toml` (for example, with `cargo xtask version set 1.2.0`) and
+   merge it into `main`.
+2. Run **Actions › Release › Run workflow** with `version` (without the leading `v`). `publish` makes
+   the release public at once; otherwise it stays a draft. `prerelease` marks it as a pre-release.
+3. The shared workflow builds Windows x64 (`.msi`, `-portable.zip`), macOS universal (`.dmg`) and
+   Linux x86_64 and aarch64 (`.AppImage`, `.tar.gz`, `.deb`, `.rpm`), named
+   `lightcraft-<version>-<os>-<arch>[-portable].<ext>`, with `SHA256SUMS.txt` (signed when the
+   `RELEASE_SIGNING_KEY` secret exists), an SBOM and build provenance, and creates the GitHub Release
+   tagged `v<version>`. Signing secrets (`MACOS_CERTIFICATE`, `WINDOWS_CERTIFICATE`, …) are optional;
+   their steps are skipped without them.
 
-The workflow replaces assets when it updates an existing draft. It stops rather than overwriting a
-release that has already been published, so bump the version before producing another release.
+The Arthavan Projects launcher installs and updates LightCraft from these releases; LightCraft has no
+updater of its own (started by the launcher, `ARTHAVAN_LAUNCHER=1`, About says so).
+
+The platform scripts below (`packaging/`) still build the other formats (Windows ARM64, FreeBSD,
+Flatpak, web) locally; they are not part of the release workflow.
 
 ## Builds and artifacts
 
@@ -37,8 +41,8 @@ and the WASM web app. The platform scripts in [`packaging/`](../packaging/) writ
   of `packaging/linux/package.sh`).
 - Flatpak: a single-file `.flatpak` bundle for each architecture, repackaged from that
   architecture's Linux tarball (`packaging/linux/flatpak-bundle.sh` with
-  `packaging/linux/flatpak/ai.storyteller.lightcraft.bundle.yml`; no Rust build). The from-source
-  manifest `ai.storyteller.lightcraft.yml` is for Flathub; packaging-lint keeps their runtime and
+  `packaging/linux/flatpak/app.freedev.ainz.ks.LightCraft.bundle.yml`; no Rust build). The from-source
+  manifest `app.freedev.ainz.ks.LightCraft.yml` is for Flathub; packaging-lint keeps their runtime and
   `finish-args` identical.
 - FreeBSD: `lightcraft-<version>-freebsd-x86_64.tar.gz`, a `/usr/local`-style tree built in a
   FreeBSD 14.3 VM (`packaging/freebsd/package.sh`, the same packages as `freebsd.yml`). Install
