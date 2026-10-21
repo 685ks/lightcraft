@@ -1,0 +1,10 @@
+# cargo-nextest settings (CI runs `cargo nextest run`; plain `cargo test` ignores this file).
+
+# A few UI tests measure behaviour against wall-clock or frame budgets while background render
+# workers run: the slideshow preparing its next slides before they are due, and a loupe drag
+# whose renders are superseded until a window tile arrives. Next to dozens of other tests on a
+# shared runner, those workers starve and the tests fail for the runner's sake, not the app's.
+# They run alone, with the machine to themselves; they still run on every system.
+[[profile.default.overrides]]
+filter = 'package(lightcraft-ui-egui) and (test(/^tests_slideshow::/) or test(/^tests_preview_limit::/))'
+threads-required = "num-cpus"
