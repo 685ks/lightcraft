@@ -1,49 +1,51 @@
-//! Optional build input: with `CRAFT_FONTS_DIR=<storytold/craft-fonts checkout>`, embed every font
-//! in its `fonts/manifest.txt` as `CRAFT_FONTS` (see src/fonts.rs). Unset, `CRAFT_FONTS` is empty.
-//! Recipe from craft-fonts' docs/integration.md; craft-fonts is never a Cargo dependency, and this
-//! script only reads a local directory (no network).
+//! Optional build input: with `CRAFT_FONTS_DIR=<craft-fonts checkout>`, embed every font in its
+//! `fonts/manifest.txt` as `CRAFT_FONTS` (see src/fonts.rs). Unset, `CRAFT_FONTS` is empty.
+//! The embedding is done by `craft-fonts-build` (685ks/craft-fonts, docs/integration.md) in its
+//! legacy mode, which emits the `CraftFont { family, style, scripts, bytes }` initialisers that
+//! src/fonts.rs defines; craft-fonts itself is never a Cargo dependency, and this script only reads
+//! a local directory (no network).
 //!
 //! wasm32 embeds BIZ UDPGothic Regular (~4.5 MB) and Noto Sans Thai (~214 KiB), to keep the
 //! `.wasm` within the web size budget (Cloudflare serves at most 25 MiB per file); the export
 //! watermark falls back to it there. Native builds embed every font.
-use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
+
+/// The faces the web build embeds.
+const WEB_FONTS: &[(&str, &str)] = &[("BIZ UDPGothic", "Regular"), ("Noto Sans Thai", "Regular")];
 
 fn main() {
     println!("cargo::rerun-if-changed=build.rs");
     println!("cargo::rerun-if-env-changed=CRAFT_FONTS_DIR");
     println!("cargo::rerun-if-env-changed=CRAFT_FONTS_REQUIRED");
     let required = std::env::var_os("CRAFT_FONTS_REQUIRED").is_some();
-    let mut src = String::from("pub static CRAFT_FONTS: &[CraftFont] = &[\n");
-    let mut embedded = 0;
-    if let Some(dir) = std::env::var_os("CRAFT_FONTS_DIR").map(PathBuf::from).map(resolve) {
-        match craft_fonts(&dir, required) {
-            Ok(entries) => {
-                embedded = entries.lines().count();
-                src.push_str(&entries);
-            }
-            Err(e) if required => {
+    let wasm = std::env::var("CARGO_CFG_TARGET_ARCH").is_ok_and(|a| a == "wasm32");
+    let dir = std::env::var_os("CRAFT_FONTS_DIR").filter(|d| !d.is_empty()).map(PathBuf::from).map(resolve);
+    let mut builder = craft_fonts_build::Builder::new().legacy(true).web_fonts(WEB_FONTS).required(required);
+    builder = match &dir {
+        Some(dir) => builder.dir(dir.clone()),
+        None => builder.no_checkout(),
+    };
+    match &dir {
+        Some(dir) => {
+            if let Err(e) = required_faces(dir, wasm)
+                && required
+            {
                 println!("cargo::error=CRAFT_FONTS_DIR={}: {e}", dir.display());
             }
-            Err(e) => println!("cargo::warning=building without craft-fonts: CRAFT_FONTS_DIR={}: {e}", dir.display()),
         }
-    } else if required {
-        println!("cargo::error=CRAFT_FONTS_REQUIRED is set but CRAFT_FONTS_DIR is missing");
+        None if required => println!("cargo::error=CRAFT_FONTS_REQUIRED is set but CRAFT_FONTS_DIR is missing"),
+        None => {
+            // Without them the app still runs and every language is still selectable, so Chinese
+            // and Japanese just paint boxes — the one failure a user cannot diagnose from what
+            // they see.
+            println!(
+                "cargo::warning=no craft-fonts embedded: Chinese and Japanese text will render as empty boxes. \
+                 Clone https://github.com/685ks/craft-fonts next to this repo and rebuild with \
+                 CRAFT_FONTS_DIR=../craft-fonts"
+            );
+        }
     }
-    src.push_str("];\n");
-    // Without them the app still runs and every language still selectable, so Chinese and Japanese
-    // just paint boxes — the one failure a user cannot diagnose from what they see.
-    if embedded == 0 {
-        println!(
-            "cargo::warning=no craft-fonts embedded: Chinese and Japanese text will render as empty boxes. \
-             Clone https://github.com/storytold/craft-fonts next to this repo and rebuild with \
-             CRAFT_FONTS_DIR=../craft-fonts"
-        );
-    }
-    let out = PathBuf::from(std::env::var_os("OUT_DIR").unwrap_or_default()).join("craft_fonts.rs");
-    if let Err(e) = std::fs::write(&out, src) {
-        println!("cargo::error=writing {}: {e}", out.display());
-    }
+    builder.emit();
 }
 
 /// Resolve a relative `CRAFT_FONTS_DIR` against both roots a caller might mean: a build script's
@@ -60,45 +62,23 @@ fn resolve(dir: PathBuf) -> PathBuf {
     candidates.iter().find(|candidate| candidate.is_dir()).cloned().unwrap_or_else(|| candidates[0].clone())
 }
 
-/// One `CraftFont { .. }` initialiser per manifest line.
-fn craft_fonts(dir: &Path, required: bool) -> Result<String, String> {
+/// The UI faces a release must carry (Japanese, Simplified Chinese natively, Thai): a checkout
+/// without them is an error when `CRAFT_FONTS_REQUIRED` is set.
+fn required_faces(dir: &Path, wasm: bool) -> Result<(), String> {
     let manifest = dir.join("fonts/manifest.txt");
-    println!("cargo::rerun-if-changed={}", manifest.display());
     let text = std::fs::read_to_string(&manifest).map_err(|e| format!("{}: {e}", manifest.display()))?;
-    let wasm = std::env::var("CARGO_CFG_TARGET_ARCH").is_ok_and(|a| a == "wasm32");
-    let mut out = String::new();
-    let mut has_japanese_ui = false;
-    let mut has_chinese_ui = false;
-    let mut has_thai_ui = false;
-    for line in text.lines().map(str::trim).filter(|l| !l.is_empty() && !l.starts_with('#')) {
-        let f: Vec<&str> = line.split(" | ").map(str::trim).collect();
-        let [family, style, file, scripts, ..] = f.as_slice() else {
-            return Err(format!("malformed manifest line: {line}"));
-        };
-        has_japanese_ui |= (*family, *style) == ("BIZ UDPGothic", "Regular");
-        has_chinese_ui |= (*family, *style) == ("Noto Sans CJK SC", "Regular") && scripts.split(',').any(|script| script.trim() == "Hans");
-        has_thai_ui |= (*family, *style) == ("Noto Sans Thai", "Regular") && scripts.split(',').any(|script| script.trim() == "Thai");
-        if wasm && !matches!((*family, *style), ("BIZ UDPGothic" | "Noto Sans Thai", "Regular")) {
-            continue;
-        }
-        let path = dir.join(file).canonicalize().map_err(|e| format!("{file}: {e}"))?;
-        println!("cargo::rerun-if-changed={}", path.display());
-        let scripts: Vec<String> = scripts.split(',').map(|s| format!("{:?}", s.trim())).collect();
-        let _ = writeln!(
-            out,
-            "    CraftFont {{ family: {family:?}, style: {style:?}, scripts: &[{}], bytes: include_bytes!({:?}) }},",
-            scripts.join(", "),
-            path.display().to_string(),
-        );
-    }
-    if required && !has_thai_ui {
+    let entries = craft_fonts_build::parse_manifest(&text).map_err(|e| e.to_string())?;
+    let has = |family: &str, script: Option<&str>| {
+        entries.iter().any(|e| e.family == family && e.style == "Regular" && script.is_none_or(|s| e.scripts.iter().any(|x| x == s)))
+    };
+    if !has("Noto Sans Thai", Some("Thai")) {
         return Err("required Thai UI face Noto Sans Thai Regular (Thai) is missing from fonts/manifest.txt".into());
     }
-    if required && !has_japanese_ui {
+    if !has("BIZ UDPGothic", None) {
         return Err("required Japanese UI face BIZ UDPGothic Regular is missing from fonts/manifest.txt".into());
     }
-    if required && !wasm && !has_chinese_ui {
+    if !wasm && !has("Noto Sans CJK SC", Some("Hans")) {
         return Err("required Simplified Chinese UI face Noto Sans CJK SC Regular (Hans) is missing from fonts/manifest.txt".into());
     }
-    Ok(out)
+    Ok(())
 }

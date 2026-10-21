@@ -22,17 +22,19 @@ fn frame(app: &mut LightcraftApp, ctx: &egui::Context) {
 }
 
 #[test]
-fn new_users_keep_the_dark_look_and_old_settings_load_unchanged() {
+fn new_users_get_the_house_theme_and_old_settings_load_unchanged() {
     let s = AppSettings::default();
-    assert_eq!((s.appearance_mode, s.dark_theme, s.light_theme), (AppearanceMode::Dark, DarkTheme::Charcoal, LightTheme::Silver));
-    assert_eq!(s.theme(Some(egui::Theme::Light)), ThemeKind::Charcoal, "Auto is opt-in");
-    // a ui.json saved before appearance modes existed
+    assert_eq!((s.appearance_mode, s.dark_theme, s.light_theme), (AppearanceMode::Dark, DarkTheme::House, LightTheme::Silver));
+    assert_eq!(s.theme(Some(egui::Theme::Light)), ThemeKind::House, "Auto is opt-in");
+    // a ui.json saved before appearance modes existed: dark, on the house theme
     let old: UiState = serde_json::from_str(r#"{"settings": {"gridBadges": "always", "startupView": "detail"}}"#).unwrap();
     assert_eq!(old.settings.appearance_mode, AppearanceMode::Dark);
-    assert_eq!(old.settings.dark_theme, DarkTheme::Charcoal);
+    assert_eq!(old.settings.dark_theme, DarkTheme::House);
     assert_eq!(old.settings.light_theme, LightTheme::Silver);
     assert_eq!(old.settings.startup_view, crate::state::StartupView::Detail);
-    // and the Charcoal tokens are the ones LightCraft always had
+    // a saved choice of Charcoal is kept, and its tokens are the ones LightCraft always had
+    let charcoal: UiState = serde_json::from_str(r#"{"settings": {"darkTheme": "charcoal"}}"#).unwrap();
+    assert_eq!(charcoal.settings.dark_theme, DarkTheme::Charcoal);
     assert_eq!(crate::theme::Tokens::for_kind(ThemeKind::Charcoal).chrome, crate::theme::Tokens::default().chrome);
 }
 
@@ -131,12 +133,12 @@ fn auto_follows_the_system_and_falls_back_to_dark() {
     assert_eq!(ctx.theme(), egui::Theme::Light);
     *system.lock().unwrap() = Some(egui::Theme::Dark);
     frame(&mut a, &ctx);
-    assert_eq!(crate::theme::current(&ctx), Some(ThemeKind::Charcoal));
+    assert_eq!(crate::theme::current(&ctx), Some(ThemeKind::House));
     assert_eq!(ctx.theme(), egui::Theme::Dark);
     // no answer from the host or from egui: dark
     *system.lock().unwrap() = None;
     frame(&mut a, &ctx);
-    assert_eq!(crate::theme::current(&ctx), Some(ThemeKind::Charcoal));
+    assert_eq!(crate::theme::current(&ctx), Some(ThemeKind::House));
     // without a host service, egui's report is used
     let mut plain = app();
     plain.ui.settings.appearance_mode = AppearanceMode::Auto;
@@ -187,7 +189,7 @@ fn the_top_bar_button_and_settings_cards_drive_the_mode() {
     h.step();
     h.step();
     assert_eq!(h.app.ui.settings.appearance_mode, AppearanceMode::Dark);
-    assert_eq!(crate::theme::current(&h.view.ctx), Some(ThemeKind::Charcoal));
+    assert_eq!(crate::theme::current(&h.view.ctx), Some(ThemeKind::House));
 }
 
 #[test]
@@ -256,5 +258,5 @@ fn favorites_validate_roundtrip_and_stars_toggle_without_selecting() {
     h.step();
     assert_eq!(h.app.ui.settings.appearance_mode, AppearanceMode::Light);
     assert_eq!(h.app.ui.settings.light_theme, LightTheme::Paper);
-    assert_eq!(h.app.ui.settings.dark_theme, DarkTheme::Charcoal);
+    assert_eq!(h.app.ui.settings.dark_theme, DarkTheme::House);
 }

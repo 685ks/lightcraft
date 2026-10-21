@@ -2,7 +2,10 @@
 //! reference app's dark theme (see plan/lightroom/10-observed-ui.md); everything is our own code.
 //!
 //! Themes come in two families, picked by the Appearance Mode setting (Settings ▸ Interface):
-//! - dark: **Charcoal** (the default, the observed dark look) and **Midnight** (near black);
+//! - dark: **Arthavan Dark** (the house theme and the default: the Arthavan Projects design system
+//!   from `craft-tokens`, steel-blue accent on near-black chrome, with a neutral grey surround round
+//!   the photo for colour judgement), **Charcoal** (the observed dark look) and **Midnight** (near
+//!   black);
 //! - light: **Silver** (light grey chrome) and **Paper** (near white).
 
 use std::sync::Arc;
@@ -63,6 +66,8 @@ pub struct Tokens {
     pub thumb: Color32,
     pub thumb_hover: Color32,
     pub accent: Color32,
+    /// Text and glyphs drawn on an `accent` fill (drag badges, the primary button).
+    pub on_accent: Color32,
     pub star: Color32,
     pub pick: Color32,
     pub reject: Color32,
@@ -82,7 +87,9 @@ pub struct Tokens {
 /// An interface theme. Each belongs to the dark or the light family.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub enum ThemeKind {
+    /// The house theme (Arthavan Projects design system, from `craft-tokens`).
     #[default]
+    House,
     Charcoal,
     Midnight,
     Silver,
@@ -90,15 +97,16 @@ pub enum ThemeKind {
 }
 
 impl ThemeKind {
-    pub const ALL: [ThemeKind; 4] = [ThemeKind::Charcoal, ThemeKind::Midnight, ThemeKind::Silver, ThemeKind::Paper];
+    pub const ALL: [ThemeKind; 5] = [ThemeKind::House, ThemeKind::Charcoal, ThemeKind::Midnight, ThemeKind::Silver, ThemeKind::Paper];
 
     pub fn is_dark(self) -> bool {
-        matches!(self, ThemeKind::Charcoal | ThemeKind::Midnight)
+        matches!(self, ThemeKind::House | ThemeKind::Charcoal | ThemeKind::Midnight)
     }
 
     /// The theme's id (settings value and command suffix).
     pub fn id(self) -> &'static str {
         match self {
+            ThemeKind::House => "house",
             ThemeKind::Charcoal => "charcoal",
             ThemeKind::Midnight => "midnight",
             ThemeKind::Silver => "silver",
@@ -109,6 +117,7 @@ impl ThemeKind {
     /// The English display name.
     pub fn label(self) -> &'static str {
         match self {
+            ThemeKind::House => "Arthavan Dark",
             ThemeKind::Charcoal => "Charcoal",
             ThemeKind::Midnight => "Midnight",
             ThemeKind::Silver => "Silver",
@@ -143,6 +152,7 @@ impl Default for Tokens {
             thumb: Color32::from_rgb(0xa0, 0xa0, 0xa0),
             thumb_hover: Color32::from_rgb(0xe0, 0xe0, 0xe0),
             accent: Color32::from_rgb(0x01, 0x65, 0xdd),
+            on_accent: Color32::WHITE,
             star: Color32::from_rgb(0xd8, 0xd8, 0xd8),
             pick: Color32::from_rgb(0xf0, 0xf0, 0xf0),
             reject: Color32::from_rgb(0xe0, 0x4a, 0x4a),
@@ -165,6 +175,7 @@ impl Tokens {
         let rgb = |v: u32| Color32::from_rgb((v >> 16) as u8, (v >> 8) as u8, v as u8);
         let base = Tokens::default();
         match kind {
+            ThemeKind::House => Tokens::house(),
             ThemeKind::Charcoal => base,
             ThemeKind::Midnight => Tokens {
                 chrome: rgb(0x1e1e1e),
@@ -246,6 +257,51 @@ impl Tokens {
         }
     }
 
+    /// The house theme, filled from `craft-tokens` (the field mapping is section 2 of the design
+    /// system's ADOPTION.md). Translucent web surfaces are flattened onto the surface below them,
+    /// since egui cannot blur what is behind a panel. Metrics stay LightCraft's own.
+    fn house() -> Tokens {
+        use craft_tokens::{Rgba, color};
+        let c = |x: Rgba| Color32::from_rgba_unmultiplied(x.r, x.g, x.b, x.a);
+        let white = |alpha: f32, under: Rgba| Rgba::rgb(255, 255, 255).with_alpha(alpha).over(under);
+        let bg = color::BG_BASE;
+        let chrome = color::BG_SHEET;
+        let card = color::SURFACE_PANEL.over(bg);
+        Tokens {
+            chrome: c(chrome),
+            // The photo's surround stays a neutral grey: a tinted one would bias colour judgement.
+            canvas: Color32::from_gray(0x14),
+            grid_bg: c(bg),
+            cell: c(white(0.05, card)),
+            cell_selected: c(color::ACCENT_BASE.with_alpha(0.22).over(card)),
+            divider: c(color::BORDER_LINE_SOFT.over(chrome)),
+            inset: c(card),
+            field: c(color::SURFACE_FILL_3.over(card)),
+            field_border: c(color::BORDER_LINE.over(card)),
+            button: c(color::SURFACE_FILL_2.over(chrome)),
+            button_border: c(color::BORDER_LINE.over(chrome)),
+            hover: c(color::SURFACE_FILL_FOCUS.over(chrome)),
+            pressed: c(white(0.09, chrome)),
+            tool_active: c(color::ACCENT_BASE.with_alpha(0.18).over(chrome)),
+            text: c(color::TEXT_INK),
+            text_label: c(color::TEXT_STRONG),
+            text_dim: c(color::TEXT_MUTED),
+            text_disabled: c(color::TEXT_FAINT),
+            // Idle glyphs are the soft accent; hovered ones turn to `text`, as in the other themes.
+            icon: c(color::ACCENT_SOFT),
+            track: c(color::ACCENT_LOW),
+            thumb: c(color::ACCENT_SOFT),
+            thumb_hover: c(color::ACCENT_HIGH),
+            accent: c(color::ACCENT_BASE),
+            on_accent: c(color::TEXT_ON_ACCENT),
+            star: c(color::TEXT_STRONG),
+            pick: c(color::TEXT_INK),
+            reject: c(color::STATUS_ERROR),
+            caution: c(color::STATUS_WARN),
+            ..Tokens::default()
+        }
+    }
+
     pub fn get(ctx: &egui::Context) -> Tokens {
         ctx.data(|d| d.get_temp::<Tokens>(egui::Id::NULL)).unwrap_or_default()
     }
@@ -321,7 +377,16 @@ pub fn font_definitions_with_chinese(craft: &'static [lightcraft_engine::CraftFo
     semi.extend(defaults);
     semi.extend(bold);
     fonts.families.insert(FontFamily::Name(FONT_SEMIBOLD.into()), semi);
+    // The house monospace face: JetBrains Mono from craft-fonts, ahead of egui's own, when built
+    // with it (craftrules / craft-fonts docs/integration.md).
+    let jetbrains = craft.iter().find(|f| f.family == "JetBrains Mono" && f.style == "Regular");
+    if let Some(font) = jetbrains {
+        fonts.font_data.insert(craft_font_name(font), Arc::new(FontData::from_static(font.bytes)));
+    }
     let mono = fonts.families.entry(FontFamily::Monospace).or_default();
+    if let Some(font) = jetbrains {
+        mono.insert(0, craft_font_name(font));
+    }
     let mut mono_fallback = fallback("Regular");
     if prefer_chinese {
         mono_fallback.insert(0, WEB_CHINESE_FONT.into());
@@ -419,12 +484,24 @@ pub fn apply_kind(ctx: &egui::Context, kind: ThemeKind) {
     v.window_stroke = Stroke::new(1.0, t.button_border);
     v.window_corner_radius = CornerRadius::same(6);
     v.menu_corner_radius = CornerRadius::same(6);
-    v.selection.bg_fill = t.accent.gamma_multiply(0.6);
+    // The house accent is light, so its selection fill is the design system's 30% wash (text stays
+    // readable on it); the other themes' deep blues take 60%.
+    v.selection.bg_fill = t.accent.gamma_multiply(if kind == ThemeKind::House { 0.3 } else { 0.6 });
     v.selection.stroke = Stroke::new(1.0, t.accent);
     v.override_text_color = Some(t.text_label);
     let (popup, window) = if dark { (140, 160) } else { (50, 60) };
     v.popup_shadow = egui::epaint::Shadow { offset: [0, 4], blur: 16, spread: 0, color: Color32::from_black_alpha(popup) };
     v.window_shadow = egui::epaint::Shadow { offset: [0, 8], blur: 30, spread: 0, color: Color32::from_black_alpha(window) };
+    if kind == ThemeKind::House {
+        // `--shadow-panel` (0 24 60 -24, black 70%) for windows; egui has no negative spread.
+        let s = craft_tokens::shadow::PANEL;
+        v.window_shadow = egui::epaint::Shadow {
+            offset: [0, 24],
+            blur: 60,
+            spread: 0,
+            color: Color32::from_rgba_unmultiplied(s.color.r, s.color.g, s.color.b, s.color.a),
+        };
+    }
     let w = &mut v.widgets;
     craft_ui::theme::WidgetPalette { noninteractive: t.chrome, inactive: t.button, hovered: t.hover, active: t.pressed, open: t.hover }.apply_to(
         w,
@@ -457,7 +534,7 @@ mod tests {
     /// (`exp(40 / 200)`) instead of growing with the longer scroll.
     #[test]
     fn a_wheel_notch_scrolls_further_but_zooms_as_before_in_every_theme() {
-        for kind in [ThemeKind::Charcoal, ThemeKind::Midnight, ThemeKind::Silver, ThemeKind::Paper] {
+        for kind in ThemeKind::ALL {
             let ctx = egui::Context::default();
             apply_kind(&ctx, kind);
             let (line, zoom) = ctx.options(|o| (o.input_options.line_scroll_speed, o.input_options.scroll_zoom_speed));

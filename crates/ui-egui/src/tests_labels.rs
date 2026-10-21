@@ -74,6 +74,10 @@ fn label_tints_grid_and_filmstrip_chrome_without_changing_photo_pixels() {
 #[test]
 fn label_toast_has_pale_colour_and_rating_restores_neutral_style() {
     let mut h = app(ViewMode::SquareGrid);
+    // On the neutral-grey Charcoal theme, where "neutral" means equal channels (the house theme's
+    // toast is blue-grey).
+    h.app.run("view.theme", json!({"theme": "charcoal"})).unwrap();
+    h.step();
     h.app.run("photo.label", json!({"label": "red"})).unwrap();
     h.step();
     let at = egui::pos2(h.app.canvas_rect.unwrap().center().x, h.app.canvas_rect.unwrap().bottom() - 45.0);

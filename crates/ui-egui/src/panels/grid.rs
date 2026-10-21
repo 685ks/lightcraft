@@ -932,7 +932,7 @@ pub fn drag_feedback(app: &mut LightcraftApp, ctx: &egui::Context) {
     let text = hint.unwrap_or_else(|| crate::i18n::tr_format!("{n} photo{}", if n == 1 { "" } else { "s" }, n = n));
     egui::Area::new(egui::Id::new("drag-photos")).order(egui::Order::Tooltip).interactable(false).fixed_pos(pos + vec2(14.0, 10.0)).show(ctx, |ui| {
         egui::Frame::NONE.fill(t.accent).corner_radius(10.0).inner_margin(egui::Margin::symmetric(9, 3)).show(ui, |ui| {
-            let label = ui.add(egui::Label::new(egui::RichText::new(text).color(Color32::WHITE).font(t.semibold(12.0))).extend());
+            let label = ui.add(egui::Label::new(egui::RichText::new(text).color(t.on_accent).font(t.semibold(12.0))).extend());
             crate::widgets::register(ui.ctx(), "dragPhotos", label.rect);
         });
     });
