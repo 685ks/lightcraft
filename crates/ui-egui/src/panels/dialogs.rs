@@ -1290,21 +1290,14 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
                                 crate::theme::font_credits(app.chinese_font.is_some())
                             ));
                             ui.add_space(10.0);
-                            let r = crate::button::Button::new("Join the ArtCraft Discord")
-                                .primary()
-                                .large()
-                                .min_width(260.0)
-                                .widget("button:aboutDiscord")
-                                .tooltip(crate::links::DISCORD)
-                                .show(ui);
-                            if r.clicked() {
-                                let _ = crate::links::open(app, crate::links::DISCORD);
+                            ui.label(egui::RichText::new(crate::links::FORK_NOTE).color(t.text_dim));
+                            if crate::links::launcher_managed() {
+                                ui.label(egui::RichText::new(crate::links::LAUNCHER_UPDATES_NOTE).color(t.text_dim));
                             }
                             ui.add_space(6.0);
                             for (label, url) in [
-                                ("LightCraft website", crate::links::APP_PAGE),
                                 ("Source code on GitHub", crate::links::GITHUB),
-                                ("ArtCraft — more creative apps", crate::links::WEBSITE),
+                                ("Send Feedback…", crate::links::FEEDBACK),
                             ] {
                                 let r = ui.link(crate::i18n::tr(label)).on_hover_text(url);
                                 if r.clicked() {
@@ -1599,7 +1592,7 @@ fn sam_by_hand(sam: &lightcraft_engine::segment::Segmenter) -> bool {
 }
 
 /// The model installation guide.
-const SAM_HELP: &str = "https://github.com/storytold/lightcraft/blob/main/docs/ai-masks.md#getting-the-model";
+const SAM_HELP: &str = "https://github.com/685ks/lightcraft/blob/main/docs/ai-masks.md#getting-the-model";
 
 /// Open the configured SAM 3 folder itself; revealing a file opens its parent instead.
 pub(crate) fn show_model_folder(app: &mut LightcraftApp) -> Result<serde_json::Value, String> {

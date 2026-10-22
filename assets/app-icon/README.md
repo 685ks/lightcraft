@@ -20,7 +20,7 @@ Windows and Linux files use the full-bleed tile so the lynx reads at 16-48 px.
 
 ## Provenance
 
-The owner's original drawing, made in ArtCraft (2880 px, keyed to the three colours), vectorised with
+The upstream owner's original drawing (2880 px, keyed to the three colours), vectorised with
 craftrules `assets/logo-options/_tools/vectorize_tile.py`. The source drawing stays in craftrules at
 `assets/app-icons/lightcraft/source.png`; `lightcraft.svg` here is the canonical artwork. Licence:
 `LICENSE.txt` (MIT OR Apache-2.0, like the repo).
@@ -35,11 +35,11 @@ craftrules `assets/logo-options/_tools/vectorize_tile.py`. The source drawing st
 | `lightcraft-macos-512.png` | runtime window/Dock icon on macOS (embedded by `apps/lightcraft/src/main.rs`) |
 | `lightcraft.icns` | macOS bundle icon (`CFBundleIconFile`) |
 | `lightcraft.ico` | Windows icon, 16-256 px, embedded in `lightcraft.exe` by `apps/lightcraft/build.rs` |
-| `hicolor/<n>x<n>/apps/ai.storyteller.lightcraft.png` | Linux icon theme, 16-512 px; the 256 px one is also the runtime window icon on Windows and Linux |
-| `hicolor/scalable/apps/ai.storyteller.lightcraft.svg` | Linux scalable icon (the small SVG) |
+| `hicolor/<n>x<n>/apps/app.freedev.ainz.ks.LightCraft.png` | Linux icon theme, 16-512 px; the 256 px one is also the runtime window icon on Windows and Linux |
+| `hicolor/scalable/apps/app.freedev.ainz.ks.LightCraft.svg` | Linux scalable icon (the small SVG) |
 
-The app id is `ai.storyteller.lightcraft`: the Wayland app id, the `.desktop` file
-(`packaging/linux/ai.storyteller.lightcraft.desktop`, `Icon=ai.storyteller.lightcraft`) and the hicolor icon
+The app id is `app.freedev.ainz.ks.LightCraft`: the Wayland app id, the `.desktop` file
+(`packaging/linux/app.freedev.ainz.ks.LightCraft.desktop`, `Icon=app.freedev.ainz.ks.LightCraft`) and the hicolor icon
 name. To install on Linux, copy `hicolor/` into `/usr/share/icons/hicolor/` (or `~/.local/share/icons/hicolor/`)
 and the `.desktop` file into `applications/`.
 

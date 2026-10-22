@@ -1,16 +1,8 @@
-<p align="center">
-  <a href="https://getartcraft.com/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/brand/artcraft-logo-white.svg">
-      <img alt="ArtCraft" src="docs/brand/artcraft-logo.svg" width="200">
-    </picture>
-  </a>
-</p>
-
-
 <h1 align="center">LightCraft</h1>
 
 <h3 align="center">Your photos. Your pixels. Your machine.</h3>
+
+<p align="center"><i>本项目是 <a href="https://github.com/storytold/lightcraft">storytold/lightcraft</a> 的分支，由 Arthavan Projects 维护。与 ArtCraft 无关，也未获其认可。</i></p>
 
 <p align="center">
   <a href="README.md">English</a> ·
@@ -30,16 +22,6 @@
   <a href="ROADMAP.md"><img alt="Status: young and moving fast" src="https://img.shields.io/badge/status-young%20%26%20moving%20fast-f2a516?style=flat-square"></a>
 </p>
 
-<p align="center">
-  <a href="https://discord.gg/artcraft"><img alt="Join the ArtCraft community on Discord" src="https://img.shields.io/badge/Join%20us%20on%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" height="40"></a>
-</p>
-
-<p align="center">
-  <a href="https://getartcraft.com/apps/lightcraft"><b>getartcraft.com 上的 LightCraft</b></a> ·
-  <a href="https://getartcraft.com/">ArtCraft</a> ·
-  <a href="https://getartcraft.com/apps">全部 Crafting Apps</a>
-</p>
-
 <br>
 
 <p align="center">
@@ -47,10 +29,6 @@
   <br>
   <sub><i>安塞尔·亚当斯，《特顿山脉与蛇河》（1942）。公有领域，美国国家档案馆。在 LightCraft 中显影。</i></sub>
 </p>
-
-> [!NOTE]
-> **ArtCraft 是一个由形形色色的创作者组成的社区。** 数字艺术、生成艺术、音乐、游戏 &mdash;
-> 只要你在创作，你就是我们中的一员。**[来 Discord 打个招呼吧](https://discord.gg/artcraft)。**
 
 <p align="center">
   <a href="#edit-like-you-mean-it">编辑</a> ·
@@ -342,7 +320,7 @@ LightCraft 很年轻，而且进展很快。**我们如实所处的位置**（�
 ## Quick start
 
 ```sh
-git clone https://github.com/storytold/lightcraft && cd lightcraft
+git clone https://github.com/685ks/lightcraft && cd lightcraft
 cargo run --release -p lightcraft                       # 打开你的图库（~/Pictures/LightCraft Library；新图库会先带演示照片）
 cargo run --release -p lightcraft -- ~/Pictures/trip    # 导入你的照片（扫描文件夹，跳过重复项）
 cargo run --release -p lightcraft -- --memory           # 用完即弃的内存演示会话（不写入任何内容）
@@ -386,7 +364,7 @@ CARGO_BUILD_JOBS=1 CARGO_PROFILE_RELEASE_DEBUG=0 CARGO_PROFILE_RELEASE_LTO=false
 **中文和日文文字**需要共享字体仓库，这是一个可选的构建输入（所有正式发布版都会包含它）：
 
 ```sh
-git clone https://github.com/storytold/craft-fonts ../craft-fonts
+git clone https://github.com/685ks/craft-fonts ../craft-fonts
 CRAFT_FONTS_DIR=../craft-fonts cargo run --release -p lightcraft
 ```
 
@@ -417,16 +395,16 @@ env_logger 风格的指令，例如 `RUST_LOG=debug` 或 `RUST_LOG=warn,lightcra
 文字有字形）：
 
 ```sh
-nix run github:storytold/lightcraft                    # 桌面应用
-nix build github:storytold/lightcraft                  # → ./result/bin/{lightcraft,lightcraft-cli}
-nix develop github:storytold/lightcraft                # rust 工具链 + 原生依赖 + 字体
+nix run github:685ks/lightcraft                    # 桌面应用
+nix build github:685ks/lightcraft                  # → ./result/bin/{lightcraft,lightcraft-cli}
+nix develop github:685ks/lightcraft                # rust 工具链 + 原生依赖 + 字体
 ```
 
 在 flake 配置中（NixOS、home-manager、nix-darwin）：
 
 ```nix
 # flake.nix
-inputs.lightcraft.url = "github:storytold/lightcraft";
+inputs.lightcraft.url = "github:685ks/lightcraft";
 # 可选：使用你自己的 nixpkgs，而不是 LightCraft 锁定的那个
 # inputs.lightcraft.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -458,22 +436,22 @@ egui 前端是一个可替换的 crate；它下面没有任何东西知道 UI �
 - **绝不使用专有资源：** 不使用商业产品的图标、截图、预设、配置文件、LUT 或字体。仓库中的每一个
   图像、图标和字体都是原创、公有领域、知识共享、OFL 或宽松许可的，并在同一提交中
   于 [assets/ATTRIBUTION.md](assets/ATTRIBUTION.md) 添加条目。新字体提交到
-  [storytold/craft-fonts](https://github.com/storytold/craft-fonts)，而不是这里。
+  [storytold/craft-fonts](https://github.com/685ks/craft-fonts)，而不是这里。
 - **纯 Rust**、强制 crate 分层、一切皆命令，并且每次提交前 `cargo xtask ci` 必须通过
   （一个提交一个任务 ID）。
 - **绝不崩溃。** 非测试代码返回错误而不是 panic：不用 `unwrap()`、`expect()`、`panic!` 或
   `unsafe`，对任何来自输入的数据都做受检索引，并且每个崩溃修复都带一个回归测试。细节见
   [AGENTS.md](AGENTS.md#never-crash-outranks-feature-work)。
 
-有问题、想法，或者想先讨论一个 bug？来 [Discord](https://discord.gg/artcraft)。
+有问题、想法，或者想先讨论一个 bug？请提交 [issue](https://github.com/685ks/lightcraft/issues)。
 
 <br>
 
 ## Downloads
 
-**第一次用 LightCraft？** 从 [getartcraft.com 的 LightCraft 页面](https://getartcraft.com/apps/lightcraft)下载。那是最简单的安装方式。
+**第一次用 LightCraft？** 用 Arthavan Projects 启动器安装（它也会保持更新），或从下面的发布页下载。
 
-**想要特定的构建或格式？** 在 GitHub 上，[最新发布](https://github.com/storytold/lightcraft/releases/latest)包含下面列出的所有构建，[全部发布](https://github.com/storytold/lightcraft/releases)则有更早的版本及其说明。文件名中的 `<ver>` 是版本号，`SHA256SUMS.txt` 列出了每个文件的校验和。
+**想要特定的构建或格式？** 在 GitHub 上，[最新发布](https://github.com/685ks/lightcraft/releases/latest)包含下面列出的所有构建，[全部发布](https://github.com/685ks/lightcraft/releases)则有更早的版本及其说明。文件名中的 `<ver>` 是版本号，`SHA256SUMS.txt` 列出了每个文件的校验和。
 
 ### Windows
 
@@ -520,42 +498,8 @@ egui 前端是一个可替换的 crate；它下面没有任何东西知道 UI �
 
 ## The Crafting Apps
 
-LightCraft 是 **Crafting Apps** 之一：来自 [ArtCraft](https://getartcraft.com/) 团队的免费开源创作工具，
-每一个都用 Rust 从零编写，每一个都能独立使用。
-
-| | 应用 | 用途 | 代码 | 了解更多 |
-|:-:|---|---|---|---|
-| <img src="https://raw.githubusercontent.com/storytold/photocraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.photocraft.png" alt="" width="32" height="32"> | **PhotoCraft** | 图像编辑：图层、蒙版、文字和真正的 PSD 文件 | [GitHub](https://github.com/storytold/photocraft) | [网站](https://getartcraft.com/apps/photocraft) |
-| <img src="https://raw.githubusercontent.com/storytold/vectorcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.vectorcraft.png" alt="" width="32" height="32"> | **VectorCraft** | 矢量插画 | [GitHub](https://github.com/storytold/vectorcraft) | [网站](https://getartcraft.com/apps/vectorcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/filmcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.filmcraft.png" alt="" width="32" height="32"> | **FilmCraft** | 视频剪辑、调色与声音 | [GitHub](https://github.com/storytold/filmcraft) | [网站](https://getartcraft.com/apps/filmcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/lightcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.lightcraft.png" alt="" width="32" height="32"> | **LightCraft** | **照片图库与 raw 显影 · 你在这里** | [GitHub](https://github.com/storytold/lightcraft) | [网站](https://getartcraft.com/apps/lightcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/pdfcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.pdfcraft.png" alt="" width="32" height="32"> | **PdfCraft** | 阅读、整理和保护 PDF | [GitHub](https://github.com/storytold/pdfcraft) | [网站](https://getartcraft.com/apps/pdfcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/effectcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.effectcraft.png" alt="" width="32" height="32"> | **EffectCraft** | 动态图形与视觉特效 | [GitHub](https://github.com/storytold/effectcraft) | [网站](https://getartcraft.com/apps/effectcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/designcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.designcraft.png" alt="" width="32" height="32"> | **DesignCraft** | 页面排版与出版 | [GitHub](https://github.com/storytold/designcraft) | [网站](https://getartcraft.com/apps/designcraft) |
-
-以及 [**ArtCraft**](https://getartcraft.com/) 本身，我们为想要真正掌控力的创作者打造的 AI 图像与视频工作室。
-
-<br>
-
-<p align="center">
-  <a href="https://discord.gg/artcraft"><img alt="Join the ArtCraft community on Discord" src="https://img.shields.io/badge/Join%20us%20on%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" height="40"></a>
-</p>
-
-<h3 align="center">Come make things with us</h3>
-
-<p align="center">
-  我们的 Discord 是各种创作者聚集的地方：画画的人、拍照的人、做动画的人、剪片子的人、
-  排版的人，还有仍在摸索自己喜欢做什么的人。分享你在做的东西，
-  寻求帮助，告诉我们哪里坏了，或者告诉我们你希望这些工具能做什么。
-  无论你用什么媒介，无论你做了多久，这里都欢迎你。
-</p>
-
-<p align="center">
-  <a href="https://discord.gg/artcraft"><b>discord.gg/artcraft</b></a> ·
-  <a href="https://getartcraft.com/">getartcraft.com</a> ·
-  <a href="https://getartcraft.com/apps">The Crafting Apps</a> ·
-  <a href="https://getartcraft.com/apps/lightcraft">LightCraft</a>
-</p>
+LightCraft 是 Arthavan Projects 维护的 Craft 应用之一，这些应用都是开源 storytold 应用的分支，
+每一个都用 Rust 编写，每一个都能独立使用。Arthavan Projects 启动器负责安装和更新它们。
 
 <br>
 
@@ -570,20 +514,13 @@ Copyright (c) 2026 ArtCraft Team and the LightCraft contributors. 必需的声�
 展示照片是经 Wikimedia Commons 使用的公有领域作品：安塞尔·亚当斯，*《特顿山脉与蛇河》*
 （1942，美国国家档案馆）；多萝西娅·兰格，*《移民母亲》*（1936，美国国会图书馆）；比尔·安德斯／NASA，
 *《地出》*（1968）；NASA，*《蓝色弹珠》*（1972）。演示图库由 LightCraft 程序生成。界面字体：
-Inter（SIL OFL 1.1）。用 [craft-fonts](https://github.com/storytold/craft-fonts) 构建的版本（所有正式发布版）
+Inter（SIL OFL 1.1）。用 [craft-fonts](https://github.com/685ks/craft-fonts) 构建的版本（所有正式发布版）
 还会内嵌它的中文和日文字体（Noto Sans CJK SC、BIZ UDPGothic、BIZ UDMincho、Shippori Mincho；SIL OFL 1.1），列在其
-[ATTRIBUTION.md](https://github.com/storytold/craft-fonts/blob/main/ATTRIBUTION.md) 中。所有图标均为原创。
+[ATTRIBUTION.md](https://github.com/685ks/craft-fonts/blob/main/ATTRIBUTION.md) 中。所有图标均为原创。
 
-[`docs/brand/`](docs/brand/) 中的 ArtCraft 名称、字标和标志是
-ArtCraft 团队的商标，不在本许可范围内。它们只能在未修改的情况下，作为
-本仓库和 LightCraft 的一部分，按 [`docs/brand/LICENSE-brand.txt`](docs/brand/LICENSE-brand.txt) 使用。
-分支和修改版本必须移除它们。
-
-<p align="center">
-  <a href="https://getartcraft.com/"><img alt="ArtCraft" src="docs/brand/artcraft-mark.svg" width="28"></a><br>
-  <sub>由 <a href="https://getartcraft.com/">ArtCraft</a> 团队和社区制作。</sub>
-</p>
+本项目是 [storytold/lightcraft](https://github.com/storytold/lightcraft) 的分支，与 ArtCraft 无关，也未获其认可，
+不包含任何 ArtCraft 名称、字标或标志。
 
 ## Star history
 
-[![Star History Chart](https://api.star-history.com/svg?repos=storytold/lightcraft&type=Date&legend=top-left)](https://www.star-history.com/?repos=storytold%2Flightcraft&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=685ks/lightcraft&type=Date&legend=top-left)](https://www.star-history.com/?repos=685ks%2Flightcraft&type=date&legend=top-left)

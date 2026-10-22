@@ -58,7 +58,7 @@ until a Georgian face is available to the UI.
 | Reset / Revert | ჩამოყრა / წინა ვერსიაზე დაბრუნება |
 | Undo / Redo | დაბრუნება / გამეორება |
 
-Please follow this table and the shared ArtCraft Georgian glossary when you add strings.
+Please follow this table and the shared Georgian glossary of the Craft apps when you add strings.
 
 ## Maintenance and checks
 

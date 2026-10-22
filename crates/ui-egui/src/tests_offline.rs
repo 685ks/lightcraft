@@ -155,6 +155,13 @@ fn offline_originals_never_block_a_frame() {
     h.app.session.execute("library.source", &json!({"kind": "missing"})).unwrap();
     assert_eq!(h.app.session.source, LibrarySource::Missing);
     frames_while_asleep(&mut h, &nas, 20, "Missing Photos");
+    // The background checker may not have been scheduled yet on a slow runner: keep drawing
+    // frames (each still must not wait for the drive) until it has asked the probe.
+    let t0 = Instant::now();
+    while calls.n.load(Ordering::SeqCst) == 0 && t0.elapsed() < Duration::from_secs(30) {
+        frames_while_asleep(&mut h, &nas, 1, "Missing Photos");
+        std::thread::sleep(Duration::from_millis(5));
+    }
     assert!(calls.n.load(Ordering::SeqCst) > 0, "the probe was asked");
     assert_eq!(h.app.session.visible().len(), 0, "unknown files count as there");
 

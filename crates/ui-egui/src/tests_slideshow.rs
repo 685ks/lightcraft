@@ -87,10 +87,16 @@ fn next_slides_are_prepared_before_they_are_due() {
     let start = h.time();
     // the slide up and the next two; their renders can finish in any order
     let current = photo_up(&h);
-    assert!(
-        h.step_until(SETTLE, |h| has_slide(h, current) && ahead.iter().all(|id| has_slide(h, *id))),
-        "the slide up and the next two slides are rendered"
-    );
+    // Each headless frame moves the clock on by one frame, however long the renders take, so
+    // frames are paced at 15 ms of wall time here (60 s of slideshow ≈ 54 s): on a slow machine
+    // the background renders get the time a real slideshow would give them.
+    let rendered = |h: &Headless| has_slide(h, current) && ahead.iter().all(|id| has_slide(h, *id));
+    let t0 = std::time::Instant::now();
+    while !rendered(&h) && h.time() - start < 60.0 && t0.elapsed() < SETTLE {
+        h.step();
+        std::thread::sleep(Duration::from_millis(15));
+    }
+    assert!(rendered(&h), "the slide up and the next two slides are rendered");
     assert!(h.time() - start < 60.0, "before the first is due");
     assert_eq!(photo_up(&h), current, "still on the first slide");
     h.settle(SETTLE);

@@ -165,8 +165,7 @@ pub fn empty_state(ui: &mut egui::Ui, rect: Rect, title: &str, body: &str, actio
             Rect::from_min_size(pos2(rect.center().x - w / 2.0, buttons_top + i as f32 * (BUTTON_H + GAP)), vec2(w, BUTTON_H))
         };
         let label = egui::RichText::new(crate::i18n::tr(a.label)).font(t.semibold(13.0));
-        let button =
-            if i == 0 { egui::Button::new(label.color(egui::Color32::WHITE)).fill(t.accent) } else { egui::Button::new(label.color(t.text)) };
+        let button = if i == 0 { egui::Button::new(label.color(t.on_accent)).fill(t.accent) } else { egui::Button::new(label.color(t.text)) };
         let resp = ui.put(r, button);
         crate::widgets::register(ui.ctx(), a.widget, resp.rect);
         if resp.clicked() {

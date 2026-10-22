@@ -79,7 +79,7 @@ of it. Full standard: `../craftrules/standards/never-crash.md`
   text, because nearly every OFL Chinese face derives from it. Use it unmodified under its OFL; this does not open the
   door to Source Han under Adobe's name or to any other Adobe asset.
 - Every asset in the repository must be one of: **our own original work** (e.g. icons drawn in code as vectors, procedurally generated demo photos), **public domain / CC0**, **Creative Commons** (CC-BY / CC-BY-SA with attribution honoured), **OFL** (fonts), or **permissive open-source** (MIT/Apache-2.0/BSD/ISC) — or contributed by a person who created the asset and licenses it openly.
-- **Exception: `docs/brand/`.** The ArtCraft name, wordmark and logos there are ArtCraft Team trademarks, not open source and not covered by LightCraft's MIT OR Apache-2.0 licence (`LICENSE-MIT`, `LICENSE-APACHE`, `NOTICE`); their terms are in `docs/brand/LICENSE-brand.txt`. Use them only unmodified and never redraw, recolour or derive from them.
+- **No ArtCraft marks.** This repository is Arthavan Projects' fork of [storytold/lightcraft](https://github.com/storytold/lightcraft), not affiliated with or endorsed by ArtCraft: keep the ArtCraft name, wordmark and logos (and links to its website and Discord) out of it. `LICENSE-*` and `NOTICE` keep the upstream copyright line.
 - **Every asset must have an entry in `assets/ATTRIBUTION.md`** (path, title, author/creator, source URL or "original work", licence, date added, modifications) and its licence text when required (e.g. `assets/fonts/OFL-*.txt`). Add the entry in the same commit as the asset. Assets without an attribution entry must not be committed.
 - **Fonts live in [storytold/craft-fonts](https://github.com/storytold/craft-fonts), never in this repo.** Don't commit
   font files here (Inter, already in `assets/fonts/`, is the one exception); add new fonts to craft-fonts. LightCraft
@@ -90,7 +90,7 @@ of it. Full standard: `../craftrules/standards/never-crash.md`
   (`theme::font_definitions`) and the export watermark renderer use CJK faces (picked by script) as fallbacks after Inter; the UI also falls back on the faces of other scripts (Thai, Arabic, …). Unset,
   `CRAFT_FONTS` is empty: everything builds, tests and runs, but Chinese and Japanese text lack glyphs. Releases always build
   with it (`release.yml`, `CRAFT_FONTS_REQUIRED=1`) and ship the fonts' OFL licences. Tests that need these fonts skip
-  without it; the FreeBSD CI job runs them with it. Rules: craftrules
+  without it; release builds run them with it. Rules: craftrules
   [`standards/fonts.md`](https://github.com/storytold/craftrules/blob/main/standards/fonts.md).
 - Icons drawn in code (e.g. `crates/ui-egui/src/icons.rs`) are original work and are recorded in `assets/ATTRIBUTION.md` as such; do not trace them from Adobe icons.
 - Demo/test images: generated procedurally by `lightcraft-scenes`, or CC0 downloads kept in the gitignored `corpus/` with their source recorded. Screenshots of Adobe apps live only in the gitignored `plan/` and are never committed or published.

@@ -56,7 +56,7 @@ let
   isLinux = stdenv.hostPlatform.isLinux;
 
   # AppStream id: also the desktop file name, and the icon name in share/icons/hicolor.
-  appId = "ai.storyteller.lightcraft";
+  appId = "app.freedev.ainz.ks.LightCraft";
 
   # Libraries the binaries open at run time with dlopen(): nothing links them, so no RPATH points at
   # them — winit loads libwayland-client/libxkbcommon/libxcb, rfd libdbus-1, wgpu the Vulkan loader
@@ -209,7 +209,7 @@ rustPlatform.buildRustPackage {
       layer as its UI. It ships with lightcraft-cli, a headless renderer, command runner and MCP
       server for AI agents.
     '';
-    homepage = "https://getartcraft.com/apps/lightcraft";
+    homepage = "https://github.com/685ks/lightcraft";
     license = with lib.licenses; [
       mit
       asl20

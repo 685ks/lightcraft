@@ -1,0 +1,13 @@
+# Packaging metadata read by the shared release workflow
+# (685ks/craft-actions/.github/workflows/release-rust-app.yml, called from
+# .github/workflows/release.yml). Asset names: lightcraft-<version>-<os>-<arch>[-portable].<ext>.
+id = "lightcraft"
+display_name = "LightCraft"
+bundle_id = "app.freedev.ainz.ks.LightCraft"
+publisher = "Arthavan Projects"
+description = "A photo library and non-destructive raw developer"
+categories = ["Graphics", "RasterGraphics", "Photography"]
+icon_png = "assets/app-icon/hicolor/512x512/apps/app.freedev.ainz.ks.LightCraft.png"
+icon_icns = "assets/app-icon/lightcraft.icns"
+icon_ico = "assets/app-icon/lightcraft.ico"
+license = "MIT OR Apache-2.0"
