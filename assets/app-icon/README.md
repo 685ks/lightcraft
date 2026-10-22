@@ -1,49 +1,29 @@
 # LightCraft app icon
 
-A **lynx**, frontal head-and-shoulders portrait with an alert gaze, in the style of an engraving: the
-Crafting Apps "owl template" (full-bleed colour field, tight portrait, the figure in paper with ink line
-work and a crisp ink contour, no roundel or border).
+A lens aperture, drawn as a simple line glyph in the Arthavan Projects house style.
+Every app shares the same tile shape and glyph style, so the family reads as one set; each app has
+its own muted tint (hue 48°), and the glyph tells them apart.
 
-## Palette (exactly three colours)
+## Palette
+
+The house style's dark tile and light accent, tinted to this app's hue:
 
 | Colour | Hex | Used for |
 |---|---|---|
-| Ink | `#0b0b0c` | line work and the contour |
-| Paper | `#efe9dc` | the figure (the lynx) |
-| LightCraft amber | `#f2a516` | the full-bleed field (the app colour) |
+| Tile | `#4d4523` → `#1a170a` | Vertical gradient filling the rounded square |
+| Hairline | white at 14% | Inner edge of the tile |
+| Accent | `#e1d398` | The glyph's strokes |
+| Accent bright | `#f4eac2` | Highlights in the glyph |
+| Accent low | `#7f7139` | Soft fills behind the glyph |
 
 ## Geometry
 
-`viewBox="0 0 512 512"`, a rounded-square tile with `rx=112`, clipped; the colour fills the whole tile.
-macOS files (`.icns`, `lightcraft-macos-512.png`) add Apple's transparent margin (an 824/1024 body);
-Windows and Linux files use the full-bleed tile so the lynx reads at 16-48 px.
+A 512 × 512 viewBox, clipped to a rounded square with `rx=112`; glyph strokes are 30 units with
+round caps, so they stay legible at 16-32 px. Windows and Linux use the full tile. macOS files
+sit on Apple's grid (an 824/1024 body with a transparent margin, made by widening the viewBox).
 
-## Provenance
+## Provenance and licence
 
-The upstream owner's original drawing (2880 px, keyed to the three colours), vectorised with
-craftrules `assets/logo-options/_tools/vectorize_tile.py`. The source drawing stays in craftrules at
-`assets/app-icons/lightcraft/source.png`; `lightcraft.svg` here is the canonical artwork. Licence:
-`LICENSE.txt` (MIT OR Apache-2.0, like the repo).
-
-## Files
-
-| File | What |
-|---|---|
-| `lightcraft.svg` | canonical vector, traced at 2048 px (about 770 KB) |
-| `lightcraft-small.svg` | lighter vector, traced at 1024 px (about 360 KB) |
-| `lightcraft-1024.png` | 1024 px render (store listings, docs) |
-| `lightcraft-macos-512.png` | runtime window/Dock icon on macOS (embedded by `apps/lightcraft/src/main.rs`) |
-| `lightcraft.icns` | macOS bundle icon (`CFBundleIconFile`) |
-| `lightcraft.ico` | Windows icon, 16-256 px, embedded in `lightcraft.exe` by `apps/lightcraft/build.rs` |
-| `hicolor/<n>x<n>/apps/app.freedev.ainz.ks.LightCraft.png` | Linux icon theme, 16-512 px; the 256 px one is also the runtime window icon on Windows and Linux |
-| `hicolor/scalable/apps/app.freedev.ainz.ks.LightCraft.svg` | Linux scalable icon (the small SVG) |
-
-The app id is `app.freedev.ainz.ks.LightCraft`: the Wayland app id, the `.desktop` file
-(`Icon=app.freedev.ainz.ks.LightCraft`) and the hicolor icon
-name. To install on Linux, copy `hicolor/` into `/usr/share/icons/hicolor/` (or `~/.local/share/icons/hicolor/`)
-and the `.desktop` file into `applications/`.
-
-## Regenerate
-
-Edit `lightcraft.svg` (or `lightcraft-small.svg`), then run `packaging/icons.sh` (needs `resvg`; `iconutil`
-on macOS for the `.icns`; the `.ico` is packed by `cargo xtask ico`). Every output is committed.
+Original work: written by hand as SVG for this project, no source image traced or copied.
+MIT OR Apache-2.0, like the code. `lightcraft.svg` is the master; `packaging/icons.sh` renders every
+other file here from it.
