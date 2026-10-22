@@ -20,25 +20,6 @@ Upgrading from an installer older than 0.6.0 also keeps LightCraft in the folder
 
 To run it without installing, download `lightcraft-<version>-windows-x64-portable.zip`. Portable builds for `arm64` and `x86` are on the release page too.
 
-## macOS
-
-1. Download `lightcraft-<version>-macos-universal.dmg`. It works on Apple silicon and Intel Macs, and is signed and notarized.
-2. Open the file and install LightCraft.
-
-## Linux
-
-The release has these files for `x86_64` and `aarch64` (Arm). Replace `x86_64` with `aarch64` on Arm.
-
-| File                                         | Notes                                                    |
-|----------------------------------------------|----------------------------------------------------------|
-| `lightcraft-<version>-linux-x86_64.AppImage` | Runs anywhere.                                           |
-| `lightcraft-<version>-linux-x86_64.flatpak`  | Sandboxed. Install with `flatpak install --user <file>`. |
-| `lightcraft-<version>-linux-x86_64.deb`      | For Debian and Ubuntu.                                   |
-| `lightcraft-<version>-linux-x86_64.rpm`      | For Fedora, RHEL and openSUSE.                           |
-| `lightcraft-<version>-linux-x86_64.tar.gz`   | Unpack anywhere.                                         |
-
-RISC-V and FreeBSD builds are on the release page too. On a Wayland desktop, LightCraft runs through XWayland when it is available, because only X11 gives it file drag-and-drop.
-
 ## Install with the Arthavan Projects launcher
 
 The Arthavan Projects launcher lists LightCraft and can install and update it for you. On Windows it installs the release `.msi`.

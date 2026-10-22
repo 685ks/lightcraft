@@ -11,12 +11,12 @@
 
 <p align="center">
   <b>Photo library and raw development; an open-source, non-destructive photo library and raw developer, built in pure Rust.</b><br>
-  Native on macOS, Windows and Linux. In the browser via WebAssembly. Drivable end to end by AI agents over MCP.
+  Native on Windows. In the browser via WebAssembly. Drivable end to end by AI agents over MCP.
 </p>
 
 <p align="center">
   <img alt="Pure Rust" src="https://img.shields.io/badge/pure-Rust-f2a516?style=flat-square&logo=rust&logoColor=white">
-  <img alt="macOS, Windows, Linux and Web" src="https://img.shields.io/badge/macOS%20%C2%B7%20Windows%20%C2%B7%20Linux%20%C2%B7%20Web-8a5800?style=flat-square">
+  <img alt="Windows and Web" src="https://img.shields.io/badge/Windows%20%C2%B7%20Web-8a5800?style=flat-square">
   <img alt="MCP server included" src="https://img.shields.io/badge/MCP-ready-8a5800?style=flat-square">
   <img alt="License: MIT OR Apache-2.0" src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-8a5800?style=flat-square">
   <a href="ROADMAP.md"><img alt="Status: young and moving fast" src="https://img.shields.io/badge/status-young%20%26%20moving%20fast-f2a516?style=flat-square"></a>
@@ -448,34 +448,6 @@ too, and still in `lightcraft-panics.log` in the temp folder. The logger is `app
 The web build needs the `wasm32-unknown-unknown` target and the matching `wasm-bindgen` CLI
 (`cargo xtask web` prints the exact install command); see [docs/web.md](docs/web.md).
 
-**Nix** builds the desktop app and `lightcraft-cli` (the Nix build always includes the craft-fonts input, so Japanese
-text has glyphs):
-
-```sh
-nix run github:685ks/lightcraft                    # the desktop app
-nix build github:685ks/lightcraft                  # → ./result/bin/{lightcraft,lightcraft-cli}
-nix develop github:685ks/lightcraft                # rust toolchain + native deps + fonts
-```
-
-On NixOS, run a `cargo` build from `nix develop`: outside it the app can't find `libvulkan.so.1`, finds no GPU and
-renders on the CPU, much more slowly (it says so once at start-up). `nix run` and `nix build` set the path themselves.
-
-In a flake configuration (NixOS, home-manager, nix-darwin):
-
-```nix
-# flake.nix
-inputs.lightcraft.url = "github:685ks/lightcraft";
-# optional: build against your own nixpkgs instead of the one LightCraft pins
-# inputs.lightcraft.inputs.nixpkgs.follows = "nixpkgs";
-
-# then, in a NixOS or home-manager module (where `inputs` is in scope):
-nixpkgs.overlays = [ inputs.lightcraft.overlays.default ];   # makes `pkgs.lightcraft` available
-environment.systemPackages = [ pkgs.lightcraft ];           # home-manager: home.packages = [ pkgs.lightcraft ];
-```
-
-`nix build` installs the same desktop file, hicolor icons and AppStream metadata as the .deb/.rpm, and runs
-`cargo test --workspace` as its check phase (skip it with `pkgs.lightcraft.overrideAttrs { doCheck = false; }`).
-
 **Keyboard:** <kbd>G</kbd> grid · <kbd>D</kbd> detail · <kbd>E</kbd> edit · <kbd>C</kbd> crop · <kbd>M</kbd> masking ·
 <kbd>Shift</kbd>+<kbd>P</kbd> presets · <kbd>\\</kbd> original · <kbd>Y</kbd> before/after · <kbd>Z</kbd> zoom ·
 <kbd>J</kbd> clipping · <kbd>⌘Z</kbd> undo · <kbd>⌘/</kbd> all shortcuts.
@@ -524,34 +496,6 @@ Questions, ideas or a bug you'd like to talk through first? Open an [issue](http
 Installers and executables are code-signed. The installer asks where to install (`C:\Program Files\LightCraft` by
 default; upgrades stay in the folder you chose) and ends on a page confirming LightCraft was installed, with an
 option to start it. For unattended installs: `msiexec /i lightcraft-<ver>-windows-x64.msi /qn INSTALLFOLDER="D:\Apps\LightCraft\"`.
-
-### macOS
-
-| Build | File | Notes |
-|---|---|---|
-| App, universal (Apple silicon + Intel) | `lightcraft-<ver>-macos-universal.dmg` | Signed and notarized |
-| Command-line tool, universal | `lightcraft-cli-<ver>-macos-universal.zip` | Signed and notarized |
-
-### Linux
-
-| Format | x86_64 | aarch64 (ARM64) | Notes |
-|---|---|---|---|
-| AppImage | `lightcraft-<ver>-linux-x86_64.AppImage` | `lightcraft-<ver>-linux-aarch64.AppImage` | Portable; updates with [AppImageUpdate](https://github.com/AppImageCommunity/AppImageUpdate) (`.zsync` files) |
-| Flatpak | `lightcraft-<ver>-linux-x86_64.flatpak` | `lightcraft-<ver>-linux-aarch64.flatpak` | Sandboxed; `flatpak install --user <file>` |
-| Debian/Ubuntu | `lightcraft-<ver>-linux-x86_64.deb` | `lightcraft-<ver>-linux-aarch64.deb` | |
-| Fedora/RHEL/openSUSE | `lightcraft-<ver>-linux-x86_64.rpm` | `lightcraft-<ver>-linux-aarch64.rpm` | |
-| Tarball | `lightcraft-<ver>-linux-x86_64.tar.gz` | `lightcraft-<ver>-linux-aarch64.tar.gz` | Unpack anywhere |
-
-RISC-V (riscv64): `lightcraft-<ver>-linux-riscv64.tar.gz`, a tarball only (glibc 2.39 or newer, e.g. Ubuntu 24.04+).
-
-On a Wayland desktop LightCraft runs through XWayland when it is available, because only X11 gives
-windows file drag-and-drop; set `LIGHTCRAFT_WAYLAND=1` to use native Wayland (sharper fractional scaling, no drop).
-
-### FreeBSD
-
-| Build | File |
-|---|---|
-| x86_64 | `lightcraft-<ver>-freebsd-x86_64.tar.gz` |
 
 ### Web (WebAssembly)
 
