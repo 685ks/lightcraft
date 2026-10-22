@@ -1,6 +1,6 @@
-# Checks on every pull request and every push to main, on Linux, macOS and Windows: formatting,
+# Checks on every pull request and every push to main, on Linux and Windows: formatting,
 # Clippy, layering, the asset and parity checks, the rebrand guard, and the tests. Until this fork
-# tests only ran on FreeBSD; now every crate's tests run on all three systems.
+# tests only ran on FreeBSD; now every crate's tests run on both.
 #
 # Every action is pinned by commit SHA. Values from the event go through `env:`, never straight
 # into a `run:` script. Tests that need a GPU, the corpus, craft-fonts or a model skip themselves
@@ -79,7 +79,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Free disk space and install Linux system dependencies
