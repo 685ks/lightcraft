@@ -11,56 +11,35 @@ publisher, categories, icons) is in [`packaging/app.toml`](../packaging/app.toml
    merge it into `main`.
 2. Run **Actions › Release › Run workflow** with `version` (without the leading `v`). `publish` makes
    the release public at once; otherwise it stays a draft. `prerelease` marks it as a pre-release.
-3. The shared workflow builds Windows x64 (`.msi`, `-portable.zip`), macOS universal (`.dmg`) and
-   Linux x86_64 and aarch64 (`.AppImage`, `.tar.gz`, `.deb`, `.rpm`), named
+3. The shared workflow builds Windows x64 (`.msi`, `-portable.zip`), named
    `lightcraft-<version>-<os>-<arch>[-portable].<ext>`, with `SHA256SUMS.txt` (signed when the
    `RELEASE_SIGNING_KEY` secret exists), an SBOM and build provenance, and creates the GitHub Release
-   tagged `v<version>`. Signing secrets (`MACOS_CERTIFICATE`, `WINDOWS_CERTIFICATE`, …) are optional;
+   tagged `v<version>`. Signing secrets (`WINDOWS_CERTIFICATE`, …) are optional;
    their steps are skipped without them.
 
 The Arthavan Projects launcher installs and updates LightCraft from these releases; LightCraft has no
 updater of its own (started by the launcher, `ARTHAVAN_LAUNCHER=1`, About says so).
 
-The platform scripts below (`packaging/`) still build the other formats (Windows ARM64, FreeBSD,
-Flatpak, web) locally; they are not part of the release workflow.
+The platform scripts below (`packaging/`) still build the other formats (Windows ARM64, web)
+locally; they are not part of the release workflow.
 
 ## Builds and artifacts
 
-Release jobs build macOS universal, Windows x86/x64/ARM64, Linux x86_64/aarch64/riscv64, FreeBSD x86_64,
-and the WASM web app. The platform scripts in [`packaging/`](../packaging/) write their outputs to
+LightCraft ships for Windows (and the web) only: the macOS, Linux and FreeBSD packaging was removed.
+The platform builds are Windows x86/x64/ARM64 and the WASM web app. The platform scripts in [`packaging/`](../packaging/) write their outputs to
 `dist/release/` (the full list of files is the README's Downloads section):
 
-- macOS: app DMG and CLI ZIP.
 - Windows: MSI installer and portable ZIP for each architecture.
-- Linux: AppImage (with its `.AppImage.zsync`), `.deb`, `.rpm`, and `.tar.gz` for each
-  architecture (`packaging/linux/package.sh`). Each AppImage embeds
-  `gh-releases-zsync|storytold|lightcraft|latest|lightcraft-*-linux-<arch>.AppImage.zsync`, so
-  AppImageUpdate fetches only the changed blocks from the latest published (non-pre-) release.
-- Linux riscv64: `.tar.gz` only, cross-compiled on Ubuntu 24.04 against its riscv64 ports
-  libraries (so glibc 2.39 or newer), with the CLI smoke-tested under QEMU (`CROSS_*` variables
-  of `packaging/linux/package.sh`).
-- Flatpak: a single-file `.flatpak` bundle for each architecture, repackaged from that
-  architecture's Linux tarball (`packaging/linux/flatpak-bundle.sh` with
-  `packaging/linux/flatpak/app.freedev.ainz.ks.LightCraft.bundle.yml`; no Rust build). The from-source
-  manifest `app.freedev.ainz.ks.LightCraft.yml` is for Flathub; packaging-lint keeps their runtime and
-  `finish-args` identical.
-- FreeBSD: `lightcraft-<version>-freebsd-x86_64.tar.gz`, a `/usr/local`-style tree built in a
-  FreeBSD 14.3 VM (`packaging/freebsd/package.sh`, the same packages as `freebsd.yml`). Install
-  with `tar -xzf <file> --strip-components 1 -C /usr/local`.
 - Web: `lightcraft-web-<version>.zip`.
 
-Only the macOS, Windows and draft-release jobs use the `release` environment. The others sign
+Only the Windows and draft-release jobs use the `release` environment. The others sign
 nothing, so dispatching the workflow on a branch (`gh workflow run release.yml --ref <branch>`)
 dry-runs them: the signing jobs are refused by the environment's branch rule, and the release job,
 which needs them, is skipped.
 
-The Linux builds run on Ubuntu 22.04 and target glibc 2.35 or newer. AppImages and binaries may
-also require system libraries for the windowing stack; the `.deb` and `.rpm` packages declare
-their runtime dependencies.
-
 Release builds fetch the pinned [`storytold/craft-fonts`](https://github.com/storytold/craft-fonts)
 revision and require it (`CRAFT_FONTS_REQUIRED=1`). Keep that pin deliberate when updating the
-workflow, and bump it (in `release.yml`, five jobs, and `freebsd.yml`) whenever craft-fonts adds a face a
+workflow, and bump it (in `release.yml`) whenever craft-fonts adds a face a
 shipped language needs: a stale pin still builds, it just ships tofu (issue #319: v0.4.0 pinned a revision
 from before Noto Sans CJK SC, so Simplified Chinese had no glyphs). Before a release, check the pin against
 craft-fonts' `fonts/manifest.txt` and run `CRAFT_FONTS_DIR=../craft-fonts cargo test -p lightcraft-ui-egui i18n`,
@@ -68,7 +47,7 @@ whose glyph-coverage test checks the characters in available faces. `CRAFT_FONTS
 the native build fail if the pinned manifest lacks Noto Sans CJK SC Regular (`Hans`) or BIZ UDPGothic Regular;
 the web build requires BIZ UDPGothic Regular and packages Noto Sans CJK SC as a separate asset.
 
-Local macOS, Linux and Windows packaging scripts automatically use the sibling `../craft-fonts`
+Local Windows packaging scripts automatically use the sibling `../craft-fonts`
 checkout. If it is absent, they clone it at revision
 `3d9ab3a132ed0eff457e424226a435a901da30d3` (keep the pins in `packaging/fonts.sh` and
 `packaging/windows/fonts.ps1` in sync with the release workflow). Existing checkouts are left untouched.

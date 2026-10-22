@@ -9,16 +9,3 @@ for want in '<UIRef Id="LightcraftUI" />' 'Value="InstallDirDlg"' '<Property Id=
 done
 grep -qF '<DialogRef Id="ExitDialog" />' packaging/windows/lightcraft.wxs \
   || { echo "::error::ExitDialog is not referenced; installs and removes end without a completion dialog"; exit 1; }
-
-python3 - <<'PYEOF'
-import yaml
-manifests = []
-for name in ("app.freedev.ainz.ks.LightCraft.yml", "app.freedev.ainz.ks.LightCraft.bundle.yml"):
-    with open("packaging/linux/flatpak/" + name) as source:
-        manifest = yaml.safe_load(source)
-    assert manifest["id"] == "app.freedev.ainz.ks.LightCraft" and manifest["command"] == "lightcraft", name
-    manifests.append(manifest)
-for key in ("runtime", "runtime-version", "sdk", "finish-args"):
-    assert manifests[0][key] == manifests[1][key], f"Flatpak manifests disagree on {key}"
-print("LightCraft package identity ok")
-PYEOF

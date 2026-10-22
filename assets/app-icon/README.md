@@ -39,7 +39,7 @@ craftrules `assets/logo-options/_tools/vectorize_tile.py`. The source drawing st
 | `hicolor/scalable/apps/app.freedev.ainz.ks.LightCraft.svg` | Linux scalable icon (the small SVG) |
 
 The app id is `app.freedev.ainz.ks.LightCraft`: the Wayland app id, the `.desktop` file
-(`packaging/linux/app.freedev.ainz.ks.LightCraft.desktop`, `Icon=app.freedev.ainz.ks.LightCraft`) and the hicolor icon
+(`Icon=app.freedev.ainz.ks.LightCraft`) and the hicolor icon
 name. To install on Linux, copy `hicolor/` into `/usr/share/icons/hicolor/` (or `~/.local/share/icons/hicolor/`)
 and the `.desktop` file into `applications/`.
 

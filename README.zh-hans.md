@@ -11,12 +11,12 @@
 
 <p align="center">
   <b>照片图库与 raw 显影；开源、非破坏性的照片图库与 raw 显影工具，用纯 Rust 构建。</b><br>
-  在 macOS、Windows 和 Linux 上原生运行，也可通过 WebAssembly 在浏览器中使用，并能由 AI 智能体经 MCP 端到端驱动。
+  在 Windows 上原生运行，也可通过 WebAssembly 在浏览器中使用，并能由 AI 智能体经 MCP 端到端驱动。
 </p>
 
 <p align="center">
   <img alt="Pure Rust" src="https://img.shields.io/badge/pure-Rust-f2a516?style=flat-square&logo=rust&logoColor=white">
-  <img alt="macOS, Windows, Linux and Web" src="https://img.shields.io/badge/macOS%20%C2%B7%20Windows%20%C2%B7%20Linux%20%C2%B7%20Web-8a5800?style=flat-square">
+  <img alt="Windows and Web" src="https://img.shields.io/badge/Windows%20%C2%B7%20Web-8a5800?style=flat-square">
   <img alt="MCP server included" src="https://img.shields.io/badge/MCP-ready-8a5800?style=flat-square">
   <img alt="License: MIT OR Apache-2.0" src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-8a5800?style=flat-square">
   <a href="ROADMAP.md"><img alt="Status: young and moving fast" src="https://img.shields.io/badge/status-young%20%26%20moving%20fast-f2a516?style=flat-square"></a>
@@ -391,31 +391,6 @@ env_logger 风格的指令，例如 `RUST_LOG=debug` 或 `RUST_LOG=warn,lightcra
 网页版需要 `wasm32-unknown-unknown` target 和匹配的 `wasm-bindgen` CLI
 （`cargo xtask web` 会打印确切的安装命令）；见 [docs/web.md](docs/web.md)。
 
-**Nix** 会构建桌面应用和 `lightcraft-cli`（Nix 构建总是包含 craft-fonts 输入，所以日文
-文字有字形）：
-
-```sh
-nix run github:685ks/lightcraft                    # 桌面应用
-nix build github:685ks/lightcraft                  # → ./result/bin/{lightcraft,lightcraft-cli}
-nix develop github:685ks/lightcraft                # rust 工具链 + 原生依赖 + 字体
-```
-
-在 flake 配置中（NixOS、home-manager、nix-darwin）：
-
-```nix
-# flake.nix
-inputs.lightcraft.url = "github:685ks/lightcraft";
-# 可选：使用你自己的 nixpkgs，而不是 LightCraft 锁定的那个
-# inputs.lightcraft.inputs.nixpkgs.follows = "nixpkgs";
-
-# 然后在 NixOS 或 home-manager 模块中（`inputs` 在作用域内）：
-nixpkgs.overlays = [ inputs.lightcraft.overlays.default ];   # 让 `pkgs.lightcraft` 可用
-environment.systemPackages = [ pkgs.lightcraft ];           # home-manager：home.packages = [ pkgs.lightcraft ];
-```
-
-`nix build` 会安装与 .deb/.rpm 相同的 desktop 文件、hicolor 图标和 AppStream 元数据，并运行
-`cargo test --workspace` 作为它的检查阶段（用 `pkgs.lightcraft.overrideAttrs { doCheck = false; }` 跳过）。
-
 **键盘：** <kbd>G</kbd> 网格 · <kbd>D</kbd> 细节 · <kbd>E</kbd> 编辑 · <kbd>C</kbd> 裁剪 · <kbd>M</kbd> 蒙版 ·
 <kbd>Shift</kbd>+<kbd>P</kbd> 预设 · <kbd>\\</kbd> 原图 · <kbd>Y</kbd> 修改前后 · <kbd>Z</kbd> 缩放 ·
 <kbd>J</kbd> 溢出警告 · <kbd>⌘Z</kbd> 撤销 · <kbd>⌘/</kbd> 全部快捷键。
@@ -464,29 +439,6 @@ egui 前端是一个可替换的 crate；它下面没有任何东西知道 UI �
 安装程序和可执行文件都有代码签名。安装程序会询问安装位置（默认
 `C:\Program Files\LightCraft`；升级会留在你选择的文件夹），结束时有一页确认 LightCraft 已安装，
 并可选择启动它。无人值守安装：`msiexec /i lightcraft-<ver>-windows-x64.msi /qn INSTALLFOLDER="D:\Apps\LightCraft\"`。
-
-### macOS
-
-| 构建 | 文件 | 说明 |
-|---|---|---|
-| 应用，通用（Apple 芯片 + Intel） | `lightcraft-<ver>-macos-universal.dmg` | 已签名并公证 |
-| 命令行工具，通用 | `lightcraft-cli-<ver>-macos-universal.zip` | 已签名并公证 |
-
-### Linux
-
-| 格式 | x86_64 | aarch64 (ARM64) | 说明 |
-|---|---|---|---|
-| AppImage | `lightcraft-<ver>-linux-x86_64.AppImage` | `lightcraft-<ver>-linux-aarch64.AppImage` | 随处可运行；用 [AppImageUpdate](https://github.com/AppImageCommunity/AppImageUpdate)（`.zsync` 文件）自我更新 |
-| Flatpak | `lightcraft-<ver>-linux-x86_64.flatpak` | `lightcraft-<ver>-linux-aarch64.flatpak` | 沙箱化；`flatpak install --user <file>` |
-| Debian/Ubuntu | `lightcraft-<ver>-linux-x86_64.deb` | `lightcraft-<ver>-linux-aarch64.deb` | |
-| Fedora/RHEL/openSUSE | `lightcraft-<ver>-linux-x86_64.rpm` | `lightcraft-<ver>-linux-aarch64.rpm` | |
-| 压缩包 | `lightcraft-<ver>-linux-x86_64.tar.gz` | `lightcraft-<ver>-linux-aarch64.tar.gz` | 解压到任意位置 |
-
-### FreeBSD
-
-| 构建 | 文件 |
-|---|---|
-| x86_64 | `lightcraft-<ver>-freebsd-x86_64.tar.gz` |
 
 ### 网页版（WebAssembly）
 
